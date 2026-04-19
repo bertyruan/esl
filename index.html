@@ -47,7 +47,7 @@
       }
 
       .selector-label {
-        font-size: 0.85rem;
+        font-size: 1.2rem;
         text-transform: uppercase;
         letter-spacing: 1.5px;
         font-weight: 600;
@@ -59,7 +59,7 @@
       .custom-select {
         width: 100%;
         padding: 0.9rem 1.2rem;
-        font-size: 1rem;
+        font-size: 1.5rem;
         font-weight: 500;
         background-color: #ffffff;
         border: 2px solid #e2e8f0;
@@ -137,7 +137,7 @@
       .current-word {
         font-size: clamp(2.4rem, 10vw, 4.5rem);
         font-weight: 800;
-        letter-spacing: -0.02em;
+        letter-spacing: 0.6rem;
         background: linear-gradient(120deg, #0f172a, #334155);
         background-clip: text;
         -webkit-background-clip: text;
@@ -209,6 +209,7 @@
         color: #6c7a8e;
         margin-top: 1rem;
         text-align: center;
+        display: none;
       }
 
       /* local file hint */
@@ -263,14 +264,20 @@
         color: #94a3b8;
         margin-top: 1.5rem;
       }
+
+      h2 {
+        margin-bottom: 1rem;
+        text-align: center;
+      }
     </style>
   </head>
   <body>
     <div class="card">
       <div class="container">
+        <h2>复习自然拼读和口语</h2>
         <!-- Section 1: Dropdown menu listing all words -->
         <div class="selector-section">
-          <span class="selector-label">📖 SELECT WORD</span>
+          <span class="selector-label">📖 选字</span>
           <select
             id="wordDropdown"
             class="custom-select"
@@ -281,10 +288,10 @@
         <!-- Section 2: Previous / Next buttons -->
         <div class="nav-section">
           <button id="prevBtn" class="nav-btn" aria-label="Previous word">
-            ◀ Previous
+            ◀ 上一个
           </button>
           <button id="nextBtn" class="nav-btn" aria-label="Next word">
-            Next ▶
+            下一个 ▶
           </button>
         </div>
 
@@ -292,28 +299,24 @@
         <div class="word-display">
           <div class="current-word" id="currentWordDisplay">—</div>
           <div class="audio-controls">
-            <button id="playAudioBtn" class="audio-btn play-btn">▶ Play</button>
+            <button id="playAudioBtn" class="audio-btn play-btn">▶ 播放</button>
             <button id="pauseAudioBtn" class="audio-btn pause-btn">
-              ⏸ Pause
+              ⏸ 暂停
             </button>
             <button id="replayAudioBtn" class="audio-btn replay-btn">
-              ⟳ Replay
+              ⟳ 重放
             </button>
           </div>
-          <div id="audioStatusMsg" class="audio-status">
-            🎵 Local audio ready
-          </div>
-          <div class="local-hint">
+          <div id="audioStatusMsg" class="audio-status">🎵 音频已就绪</div>
+          <!-- <div class="local-hint">
             💡 <strong>Local audio files</strong><br />
             Each word uses a local file path (e.g.,
             <code>./audio/word.mp3</code>).<br />
             Place your audio files in the <code>audio/</code> folder or update
             the paths below.
-          </div>
+          </div> -->
         </div>
-        <footer>
-          Plays from local file system • Update paths to match your audio files
-        </footer>
+        <footer>练习自然拼读</footer>
       </div>
     </div>
 
@@ -328,13 +331,7 @@
       // To make this fully functional, create an "audio" folder and place files.
       // ==================================================================
 
-      const words = [
-        ["rag", "./audio/1.m4a"],
-        ["Ephemeral", "./audio/ephemeral.mp3"],
-        ["Luminous", "./audio/luminous.mp3"],
-        ["Mellifluous", "./audio/mellifluous.mp3"],
-        ["Resilience", "./audio/resilience.mp3"],
-      ];
+      const words = [["rag", "./audio/1.m4a"]];
 
       // ----- Helper: Check if running in a local file environment -----
       // Provide fallback instructions if files don't exist.
