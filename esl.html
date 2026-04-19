@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Word Audio Player | Responsive UI</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        background: linear-gradient(145deg, #f5f7fc 0%, #eef2f6 100%);
+        font-family: system-ui, -apple-system, "Segoe UI", "Roboto",
+          "Helvetica Neue", sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      /* main card container */
+      .card {
+        max-width: 680px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(0px);
+        border-radius: 56px;
+        box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25),
+          0 2px 8px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        transition: all 0.2s ease;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+      }
+
+      /* inner padding structure */
+      .container {
+        padding: 2rem 1.8rem 2.2rem;
+      }
+
+      /* section 1: dropdown area */
+      .selector-section {
+        margin-bottom: 2rem;
+      }
+
+      .selector-label {
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-weight: 600;
+        color: #4a5b6e;
+        margin-bottom: 0.6rem;
+        display: block;
+      }
+
+      .custom-select {
+        width: 100%;
+        padding: 0.9rem 1.2rem;
+        font-size: 1.6rem;
+        font-weight: 500;
+        background-color: #ffffff;
+        border: 2px solid #e2e8f0;
+        border-radius: 44px;
+        appearance: none;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%233b4b5e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+        background-repeat: no-repeat;
+        background-position: right 1.2rem center;
+        background-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #1e293b;
+      }
+
+      .custom-select:focus {
+        outline: none;
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+      }
+
+      /* section 2: nav buttons (prev/next) */
+      .nav-section {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2.2rem;
+      }
+
+      .nav-btn {
+        flex: 1;
+        background: #ffffff;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 60px;
+        padding: 0.8rem 0;
+        font-weight: 600;
+        font-size: 1rem;
+        color: #2c3e4e;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background-color: #fefefe;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+      }
+
+      .nav-btn:hover {
+        background-color: #f1f5f9;
+        border-color: #cbd5e1;
+        transform: scale(0.98);
+      }
+
+      .nav-btn:active {
+        background-color: #e6edf4;
+        transform: scale(0.96);
+      }
+
+      /* main display area */
+      .word-display {
+        background: linear-gradient(135deg, #fafcff 0%, #ffffff 100%);
+        border-radius: 48px;
+        padding: 2rem 1.5rem;
+        margin-bottom: 1.8rem;
+        text-align: center;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02),
+          0 12px 20px -12px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+      }
+
+      .current-word {
+        font-size: clamp(2.4rem, 10vw, 4.5rem);
+        font-weight: 800;
+        letter-spacing: 0.5em;
+        background: linear-gradient(120deg, #0f172a, #334155);
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        margin-bottom: 1.2rem;
+        word-break: break-word;
+      }
+
+      /* audio control buttons */
+      .audio-controls {
+        display: flex;
+        justify-content: center;
+        gap: 1.2rem;
+        flex-wrap: wrap;
+        margin-top: 0.8rem;
+      }
+
+      .audio-btn {
+        background: white;
+        border: none;
+        padding: 0.8rem 1.6rem;
+        border-radius: 60px;
+        font-size: 1rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e9eef3;
+        color: #1e293b;
+      }
+
+      .audio-btn:active {
+        transform: scale(0.94);
+      }
+
+      .play-btn {
+        background: #8b5cf6;
+        border-color: #7c3aed;
+        color: white;
+        box-shadow: 0 6px 14px rgba(139, 92, 246, 0.3);
+      }
+
+      .play-btn:hover {
+        background: #7c3aed;
+        transform: translateY(-2px);
+      }
+
+      .pause-btn {
+        background: #f8fafc;
+      }
+
+      .pause-btn:hover {
+        background: #f1f5f9;
+      }
+
+      .replay-btn {
+        background: #f8fafc;
+      }
+
+      .replay-btn:hover {
+        background: #f1f5f9;
+      }
+
+      /* loading / error state tiny */
+      .audio-status {
+        font-size: 0.75rem;
+        color: #6c7a8e;
+        margin-top: 1rem;
+        text-align: center;
+      }
+
+      hr {
+        margin: 0.5rem 0 1rem;
+        border: none;
+        height: 1px;
+        background: #e9edf2;
+      }
+
+      /* responsive fine-tune for mobile */
+      @media (max-width: 550px) {
+        .container {
+          padding: 1.5rem 1.2rem;
+        }
+        .audio-btn {
+          padding: 0.65rem 1.2rem;
+          font-size: 0.9rem;
+        }
+        .audio-controls {
+          gap: 0.8rem;
+        }
+        .nav-btn {
+          padding: 0.65rem 0;
+          font-size: 0.9rem;
+        }
+        .word-display {
+          padding: 1.5rem 1rem;
+        }
+      }
+
+      /* subtle focus ring for accessibility */
+      button:focus-visible,
+      select:focus-visible {
+        outline: 2px solid #8b5cf6;
+        outline-offset: 2px;
+      }
+
+      footer {
+        text-align: center;
+        font-size: 0.7rem;
+        color: #94a3b8;
+        margin-top: 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="container">
+        <!-- Section 1: Dropdown menu listing all words -->
+        <div class="selector-section">
+          <span class="selector-label">📖 选字</span>
+          <select
+            id="wordDropdown"
+            class="custom-select"
+            aria-label="Word list dropdown"
+          ></select>
+        </div>
+
+        <!-- Section 2: Previous / Next buttons -->
+        <div class="nav-section">
+          <button id="prevBtn" class="nav-btn" aria-label="Previous word">
+            ◀ 上一个
+          </button>
+          <button id="nextBtn" class="nav-btn" aria-label="Next word">
+            下一个 ▶
+          </button>
+        </div>
+
+        <!-- Section 3: Main UI: current word + audio player controls -->
+        <div class="word-display">
+          <div class="current-word" id="currentWordDisplay">—</div>
+          <div class="audio-controls">
+            <button id="playAudioBtn" class="audio-btn play-btn">▶ 播放</button>
+            <button id="pauseAudioBtn" class="audio-btn pause-btn">
+              ⏸ 暂停
+            </button>
+            <button id="replayAudioBtn" class="audio-btn replay-btn">
+              ⟳ 重放
+            </button>
+          </div>
+          <div id="audioStatusMsg" class="audio-status">✨ Ready to play</div>
+        </div>
+        <footer>自然拼读练习</footer>
+      </div>
+    </div>
+
+    <script>
+      // ------------------------------------------------------------------
+      // DATA: list named 'words' containing [word, audio_file] strings
+      // Audio files: using sample online audio placeholders for demo.
+      // For realistic demo, we use some freely available example sounds.
+      // In real scenario replace with actual paths. To make fully functional
+      // we embed some reliable public domain / freesound test files.
+      // However to guarantee no broken external links, we generate a few
+      // sample synthetic audio (Web Audio API based) but that's heavy.
+      // Instead we will use realistic example .mp3/.wav from reliable sources?
+      // For robust demonstration I'll use three classic 'hello' style sounds from
+      // freesound? better: use standard browser-supported test tones?
+      // Actually we can use DataURI? No, simplest: use a few known working samples
+      // from 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' but
+      // that is music not word-specific. But we can also generate using Web Audio
+      // but that makes 'play' inconsistent. Better: use inline wav base64? Too heavy.
+      // I will use some direct working .mp3 from a demo CDN that produces short beep
+      // but for professionalism: we can use realistic placeholders.
+      // Given requirement: each word maps to audio_file string. For complete demo,
+      // I'll use reliable external example audio from 'https://actions.google.com/sound/...' no.
+      // Instead I will embed small set of actual word pronounciations via
+      // 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3'? That's music.
+      // Let's use three different short MP3 samples that actually exist:
+      // 1. https://samplelib.com/lib/preview/mp3/sample-3s.mp3 (short 3 sec)
+      // 2. https://samplelib.com/lib/preview/mp3/sample-6s.mp3
+      // 3. https://samplelib.com/lib/preview/mp3/sample-9s.mp3
+      // These are generic but playable and safe. For a real project you would replace with actual word audios.
+      // But user expects 'audio_file' to be string, so we do exactly that.
+      // I will create a nice vocabulary demo list.
+
+      const words = [
+        [
+          "rag",
+          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+        ],
+        [
+          "hug",
+          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+        ],
+        [
+          "bag",
+          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        ],
+        [
+          "dig",
+          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+        ],
+        [
+          "bug",
+          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+        ],
+        ["big", ""],
+        ["fog", ""],
+        ["dog", ""],
+      ];
+
+      // Note: SoundHelix songs are actual music tracks (creative commons). They serve as demo audio.
+      // For a proper dictionary app, you would replace with real voice recordings, but this satisfies
+      // the requirement that each audio_file is a string (URL). The play/pause/replay will control an Audio object.
+
+      // ----- Application state -----
+      let currentIndex = 0; // index of currently selected word
+      let audioPlayer = null; // HTMLAudioElement instance
+      let currentAudioSrc = null; // store current src to avoid reloads
+
+      // DOM elements
+      const dropdown = document.getElementById("wordDropdown");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const currentWordDisplay = document.getElementById("currentWordDisplay");
+      const playBtn = document.getElementById("playAudioBtn");
+      const pauseBtn = document.getElementById("pauseAudioBtn");
+      const replayBtn = document.getElementById("replayAudioBtn");
+      const audioStatusMsg = document.getElementById("audioStatusMsg");
+
+      // Helper: update status message
+      function setStatusMessage(msg, isError = false) {
+        audioStatusMsg.textContent = msg;
+        audioStatusMsg.style.color = isError ? "#e11d48" : "#4b5563";
+        if (!isError) {
+          setTimeout(() => {
+            if (audioStatusMsg.textContent === msg)
+              audioStatusMsg.style.color = "#6c7a8e";
+          }, 2000);
+        }
+      }
+
+      // Initialize or reload audio player for a given audio URL
+      function loadAudio(url) {
+        if (audioPlayer) {
+          audioPlayer.pause();
+          audioPlayer.src = "";
+          // remove old event listeners to avoid duplicates
+          audioPlayer.onended = null;
+          audioPlayer.onerror = null;
+          audioPlayer.oncanplaythrough = null;
+        }
+        audioPlayer = new Audio(url);
+        currentAudioSrc = url;
+
+        // event: when audio finishes playing, reset status but no action needed
+        audioPlayer.onended = () => {
+          setStatusMessage(`✓ Finished playing "${words[currentIndex][0]}"`);
+        };
+
+        audioPlayer.onerror = (e) => {
+          console.warn("Audio load error", e);
+          setStatusMessage(
+            `⚠️ Cannot play audio for "${words[currentIndex][0]}". Check URL.`,
+            true
+          );
+        };
+
+        audioPlayer.oncanplaythrough = () => {
+          setStatusMessage(`🎵 Ready: "${words[currentIndex][0]}"`);
+        };
+
+        // preload metadata
+        audioPlayer.load();
+        setStatusMessage(`📀 Loaded audio for "${words[currentIndex][0]}"`);
+      }
+
+      // Update entire UI: dropdown selection, word display, audio source
+      function updateUIAndAudio() {
+        // safety clamp index
+        if (currentIndex < 0) currentIndex = 0;
+        if (currentIndex >= words.length) currentIndex = words.length - 1;
+
+        const selectedWordData = words[currentIndex];
+        const word = selectedWordData[0];
+        const audioSrc = selectedWordData[1];
+
+        // Update displayed word
+        currentWordDisplay.textContent = word;
+
+        // Update dropdown selection without triggering infinite event loop
+        if (dropdown.value !== word) {
+          dropdown.value = word;
+        }
+
+        // load new audio only if src changed (or audioPlayer is null)
+        if (!audioPlayer || currentAudioSrc !== audioSrc) {
+          loadAudio(audioSrc);
+        } else {
+          // ensure status message shows current word ready (audio already loaded)
+          setStatusMessage(`🎧 Current: "${word}"`);
+        }
+
+        // enable/disable nav buttons at edges
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === words.length - 1;
+        // style disabled state
+        prevBtn.style.opacity = prevBtn.disabled ? "0.5" : "1";
+        nextBtn.style.opacity = nextBtn.disabled ? "0.5" : "1";
+        prevBtn.style.cursor = prevBtn.disabled ? "not-allowed" : "pointer";
+        nextBtn.style.cursor = nextBtn.disabled ? "not-allowed" : "pointer";
+      }
+
+      // Change to specific index and refresh
+      function setCurrentIndex(newIndex) {
+        if (newIndex < 0 || newIndex >= words.length) return;
+        if (currentIndex === newIndex) return;
+        currentIndex = newIndex;
+        updateUIAndAudio();
+        // optional: auto-stop playing when switching words? better UX: pause any ongoing playback
+        if (audioPlayer && !audioPlayer.paused) {
+          audioPlayer.pause();
+          setStatusMessage(
+            `⏸ Paused when switching to "${words[currentIndex][0]}"`
+          );
+        }
+      }
+
+      // Play current audio
+      function playAudio() {
+        if (!audioPlayer) {
+          setStatusMessage("⏳ Audio not ready, reloading...", false);
+          updateUIAndAudio(); // reinitializes
+          setTimeout(() => {
+            if (audioPlayer) {
+              audioPlayer
+                .play()
+                .then(() => {
+                  setStatusMessage(
+                    `▶ Now playing: "${words[currentIndex][0]}"`
+                  );
+                })
+                .catch((err) => {
+                  console.error("Playback error", err);
+                  setStatusMessage(`🚫 Play failed: ${err.message}`, true);
+                });
+            }
+          }, 50);
+          return;
+        }
+        // Resume or play
+        audioPlayer
+          .play()
+          .then(() => {
+            setStatusMessage(
+              `🔊 Playing "${words[currentIndex][originalIndex]}"`
+            );
+          })
+          .catch((err) => {
+            // auto error might be due to network: try reload once
+            console.warn("play error, reloading audio", err);
+            setStatusMessage(`⚠️ Retry loading audio...`, true);
+            loadAudio(words[currentIndex][1]);
+            setTimeout(() => {
+              if (audioPlayer) {
+                audioPlayer
+                  .play()
+                  .catch((e) =>
+                    setStatusMessage(`Cannot play audio: ${e.message}`, true)
+                  );
+              }
+            }, 100);
+          });
+        // capture original word for message
+        const originalIndex = currentIndex;
+        audioPlayer.onplay = () => {
+          if (currentIndex === originalIndex)
+            setStatusMessage(`🎶 Playing "${words[currentIndex][0]}"`);
+        };
+      }
+
+      // Pause current audio
+      function pauseAudio() {
+        if (audioPlayer && !audioPlayer.paused) {
+          audioPlayer.pause();
+          setStatusMessage(`⏸ Paused "${words[currentIndex][0]}"`);
+        } else if (audioPlayer && audioPlayer.paused) {
+          setStatusMessage(`⏸ Already paused`, false);
+        } else {
+          setStatusMessage(`No active audio`, false);
+        }
+      }
+
+      // Replay: reset to start and play
+      function replayAudio() {
+        if (!audioPlayer) {
+          updateUIAndAudio();
+          setTimeout(() => replayAudio(), 80);
+          return;
+        }
+        // reset to beginning
+        audioPlayer.currentTime = 0;
+        // if it was paused, just play
+        audioPlayer
+          .play()
+          .then(() => {
+            setStatusMessage(`🔄 Replaying "${words[currentIndex][0]}"`);
+          })
+          .catch((err) => {
+            console.error("replay failed", err);
+            setStatusMessage(`Replay error, retrying...`, true);
+            // attempt to reload audio from scratch
+            loadAudio(words[currentIndex][1]);
+            setTimeout(() => {
+              if (audioPlayer) {
+                audioPlayer.currentTime = 0;
+                audioPlayer
+                  .play()
+                  .catch((e) =>
+                    setStatusMessage(`Cannot replay: ${e.message}`, true)
+                  );
+              }
+            }, 100);
+          });
+      }
+
+      // Populate dropdown with all words, preserve current selection
+      function populateDropdown() {
+        dropdown.innerHTML = "";
+        words.forEach((item, idx) => {
+          const option = document.createElement("option");
+          option.value = item[0];
+          option.textContent = item[0];
+          dropdown.appendChild(option);
+        });
+        dropdown.value = words[currentIndex][0];
+      }
+
+      // Event: dropdown change
+      function onDropdownChange(e) {
+        const selectedWord = e.target.value;
+        const foundIndex = words.findIndex((item) => item[0] === selectedWord);
+        if (foundIndex !== -1 && foundIndex !== currentIndex) {
+          setCurrentIndex(foundIndex);
+        }
+      }
+
+      // Previous button handler
+      function onPrev() {
+        if (currentIndex > 0) {
+          setCurrentIndex(currentIndex - 1);
+        } else {
+          setStatusMessage("Already at first word", false);
+        }
+      }
+
+      // Next button handler
+      function onNext() {
+        if (currentIndex < words.length - 1) {
+          setCurrentIndex(currentIndex + 1);
+        } else {
+          setStatusMessage("Already at last word", false);
+        }
+      }
+
+      // helper for initial load & optional page visibility / cleanup but no memory leaks
+      function initApp() {
+        populateDropdown();
+        // set first index 0 and load
+        currentIndex = 0;
+        updateUIAndAudio();
+
+        // attach event listeners
+        dropdown.addEventListener("change", onDropdownChange);
+        prevBtn.addEventListener("click", onPrev);
+        nextBtn.addEventListener("click", onNext);
+        playBtn.addEventListener("click", playAudio);
+        pauseBtn.addEventListener("click", pauseAudio);
+        replayBtn.addEventListener("click", replayAudio);
+
+        // handle page visibility / clean up on page unload (optional)
+        window.addEventListener("beforeunload", () => {
+          if (audioPlayer) {
+            audioPlayer.pause();
+            audioPlayer.src = "";
+          }
+        });
+
+        // additional robustness: if audio fails due to CORS or network we already show error
+        setStatusMessage("✅ Ready — select word or use buttons");
+      }
+
+      // Edge case: make sure audio context not blocked by browser policy (user interaction)
+      // Browsers allow Audio after user interaction but we can just preload. The play/pause buttons
+      // are user-initiated, so fine.
+
+      // start everything once DOM ready
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initApp);
+      } else {
+        initApp();
+      }
+
+      // Additional fix: Some browsers might not auto-play until user interaction, but all audio
+      // controls are user-initiated, so fine. And we preload but not autoplay.
+      // For better responsiveness, if the user uses dropdown or prev/next, audio loads silently.
+      // No autoplay on page load => good.
+
+      // Enhance responsiveness: listen to touch events and buttons active states fine.
+      // For replay: ensure we don't double trigger.
+
+      // Edge handling: if audio src fails to load due to external network, we let user know but
+      // app still functional.
+      // For demo robustness I used SoundHelix examples which are valid https mp3 files (CORS friendly)
+      // They are long music clips, but it demonstrates audio playback capability.
+      // In a real product, you would replace with actual pronunciation files.
+
+      // Provide alternative if any network error: Status messages show errors and retry.
+      // Ensure drop-down selection sync with external changes.
+
+      // Expose for debugging but not needed
+      window.debugWordApp = {
+        getIndex: () => currentIndex,
+        reload: updateUIAndAudio,
+      };
+    </script>
+  </body>
+</html>
+```
