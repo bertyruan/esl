@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
-    <title>Word Audio Player | Responsive UI</title>
+    <title>Word Audio Player | Local Files</title>
     <style>
       * {
         margin: 0;
@@ -26,32 +26,28 @@
         padding: 20px;
       }
 
-      /* main card container */
       .card {
         max-width: 680px;
         width: 100%;
         background: rgba(255, 255, 255, 0.96);
-        backdrop-filter: blur(0px);
         border-radius: 56px;
         box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25),
           0 2px 8px rgba(0, 0, 0, 0.05);
         overflow: hidden;
-        transition: all 0.2s ease;
         border: 1px solid rgba(255, 255, 255, 0.5);
       }
 
-      /* inner padding structure */
       .container {
         padding: 2rem 1.8rem 2.2rem;
       }
 
-      /* section 1: dropdown area */
+      /* section 1: dropdown */
       .selector-section {
         margin-bottom: 2rem;
       }
 
       .selector-label {
-        font-size: 1rem;
+        font-size: 0.85rem;
         text-transform: uppercase;
         letter-spacing: 1.5px;
         font-weight: 600;
@@ -63,7 +59,7 @@
       .custom-select {
         width: 100%;
         padding: 0.9rem 1.2rem;
-        font-size: 1.6rem;
+        font-size: 1rem;
         font-weight: 500;
         background-color: #ffffff;
         border: 2px solid #e2e8f0;
@@ -84,7 +80,7 @@
         box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
       }
 
-      /* section 2: nav buttons (prev/next) */
+      /* section 2: prev/next buttons */
       .nav-section {
         display: flex;
         gap: 1rem;
@@ -110,15 +106,20 @@
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
       }
 
-      .nav-btn:hover {
+      .nav-btn:hover:not(:disabled) {
         background-color: #f1f5f9;
         border-color: #cbd5e1;
         transform: scale(0.98);
       }
 
-      .nav-btn:active {
+      .nav-btn:active:not(:disabled) {
         background-color: #e6edf4;
         transform: scale(0.96);
+      }
+
+      .nav-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
       }
 
       /* main display area */
@@ -136,7 +137,7 @@
       .current-word {
         font-size: clamp(2.4rem, 10vw, 4.5rem);
         font-weight: 800;
-        letter-spacing: 0.5em;
+        letter-spacing: -0.02em;
         background: linear-gradient(120deg, #0f172a, #334155);
         background-clip: text;
         -webkit-background-clip: text;
@@ -203,7 +204,6 @@
         background: #f1f5f9;
       }
 
-      /* loading / error state tiny */
       .audio-status {
         font-size: 0.75rem;
         color: #6c7a8e;
@@ -211,14 +211,26 @@
         text-align: center;
       }
 
-      hr {
-        margin: 0.5rem 0 1rem;
-        border: none;
-        height: 1px;
-        background: #e9edf2;
+      /* local file hint */
+      .local-hint {
+        background: #f1f4f9;
+        border-radius: 20px;
+        padding: 0.6rem 1rem;
+        margin-top: 1rem;
+        font-size: 0.7rem;
+        color: #4b5563;
+        text-align: center;
+        border: 1px solid #e2e8f0;
       }
 
-      /* responsive fine-tune for mobile */
+      .local-hint code {
+        background: #e2e8f0;
+        padding: 0.2rem 0.4rem;
+        border-radius: 12px;
+        font-family: monospace;
+        font-size: 0.7rem;
+      }
+
       @media (max-width: 550px) {
         .container {
           padding: 1.5rem 1.2rem;
@@ -239,7 +251,6 @@
         }
       }
 
-      /* subtle focus ring for accessibility */
       button:focus-visible,
       select:focus-visible {
         outline: 2px solid #8b5cf6;
@@ -259,7 +270,7 @@
       <div class="container">
         <!-- Section 1: Dropdown menu listing all words -->
         <div class="selector-section">
-          <span class="selector-label">📖 选字</span>
+          <span class="selector-label">📖 SELECT WORD</span>
           <select
             id="wordDropdown"
             class="custom-select"
@@ -270,95 +281,68 @@
         <!-- Section 2: Previous / Next buttons -->
         <div class="nav-section">
           <button id="prevBtn" class="nav-btn" aria-label="Previous word">
-            ◀ 上一个
+            ◀ Previous
           </button>
           <button id="nextBtn" class="nav-btn" aria-label="Next word">
-            下一个 ▶
+            Next ▶
           </button>
         </div>
 
-        <!-- Section 3: Main UI: current word + audio player controls -->
+        <!-- Section 3: Main UI - current word + local audio controls -->
         <div class="word-display">
           <div class="current-word" id="currentWordDisplay">—</div>
           <div class="audio-controls">
-            <button id="playAudioBtn" class="audio-btn play-btn">▶ 播放</button>
+            <button id="playAudioBtn" class="audio-btn play-btn">▶ Play</button>
             <button id="pauseAudioBtn" class="audio-btn pause-btn">
-              ⏸ 暂停
+              ⏸ Pause
             </button>
             <button id="replayAudioBtn" class="audio-btn replay-btn">
-              ⟳ 重放
+              ⟳ Replay
             </button>
           </div>
-          <div id="audioStatusMsg" class="audio-status">✨ Ready to play</div>
+          <div id="audioStatusMsg" class="audio-status">
+            🎵 Local audio ready
+          </div>
+          <div class="local-hint">
+            💡 <strong>Local audio files</strong><br />
+            Each word uses a local file path (e.g.,
+            <code>./audio/word.mp3</code>).<br />
+            Place your audio files in the <code>audio/</code> folder or update
+            the paths below.
+          </div>
         </div>
-        <footer>自然拼读练习</footer>
+        <footer>
+          Plays from local file system • Update paths to match your audio files
+        </footer>
       </div>
     </div>
 
     <script>
-      // ------------------------------------------------------------------
-      // DATA: list named 'words' containing [word, audio_file] strings
-      // Audio files: using sample online audio placeholders for demo.
-      // For realistic demo, we use some freely available example sounds.
-      // In real scenario replace with actual paths. To make fully functional
-      // we embed some reliable public domain / freesound test files.
-      // However to guarantee no broken external links, we generate a few
-      // sample synthetic audio (Web Audio API based) but that's heavy.
-      // Instead we will use realistic example .mp3/.wav from reliable sources?
-      // For robust demonstration I'll use three classic 'hello' style sounds from
-      // freesound? better: use standard browser-supported test tones?
-      // Actually we can use DataURI? No, simplest: use a few known working samples
-      // from 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' but
-      // that is music not word-specific. But we can also generate using Web Audio
-      // but that makes 'play' inconsistent. Better: use inline wav base64? Too heavy.
-      // I will use some direct working .mp3 from a demo CDN that produces short beep
-      // but for professionalism: we can use realistic placeholders.
-      // Given requirement: each word maps to audio_file string. For complete demo,
-      // I'll use reliable external example audio from 'https://actions.google.com/sound/...' no.
-      // Instead I will embed small set of actual word pronounciations via
-      // 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3'? That's music.
-      // Let's use three different short MP3 samples that actually exist:
-      // 1. https://samplelib.com/lib/preview/mp3/sample-3s.mp3 (short 3 sec)
-      // 2. https://samplelib.com/lib/preview/mp3/sample-6s.mp3
-      // 3. https://samplelib.com/lib/preview/mp3/sample-9s.mp3
-      // These are generic but playable and safe. For a real project you would replace with actual word audios.
-      // But user expects 'audio_file' to be string, so we do exactly that.
-      // I will create a nice vocabulary demo list.
+      // ==================================================================
+      // DATA STRUCTURE: list named 'words' containing [word, audio_file]
+      // audio_file is now a LOCAL FILE PATH (relative or absolute)
+      // ==================================================================
+      // IMPORTANT: Replace these paths with your actual local audio files.
+      // Example: "./audio/cat.mp3", "../sounds/dog.wav", "/media/hello.ogg"
+      // For demo purposes, I'm using relative paths that you can customize.
+      // To make this fully functional, create an "audio" folder and place files.
+      // ==================================================================
 
       const words = [
-        [
-          "rag",
-          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-        ],
-        [
-          "hug",
-          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
-        ],
-        [
-          "bag",
-          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-        ],
-        [
-          "dig",
-          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
-        ],
-        [
-          "bug",
-          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
-        ],
-        ["big", ""],
-        ["fog", ""],
-        ["dog", ""],
+        ["rag", "./audio/1.m4a"],
+        ["Ephemeral", "./audio/ephemeral.mp3"],
+        ["Luminous", "./audio/luminous.mp3"],
+        ["Mellifluous", "./audio/mellifluous.mp3"],
+        ["Resilience", "./audio/resilience.mp3"],
       ];
 
-      // Note: SoundHelix songs are actual music tracks (creative commons). They serve as demo audio.
-      // For a proper dictionary app, you would replace with real voice recordings, but this satisfies
-      // the requirement that each audio_file is a string (URL). The play/pause/replay will control an Audio object.
+      // ----- Helper: Check if running in a local file environment -----
+      // Provide fallback instructions if files don't exist.
 
-      // ----- Application state -----
+      // ----- Application State -----
       let currentIndex = 0; // index of currently selected word
       let audioPlayer = null; // HTMLAudioElement instance
-      let currentAudioSrc = null; // store current src to avoid reloads
+      let currentAudioSrc = null; // store current src path
 
       // DOM elements
       const dropdown = document.getElementById("wordDropdown");
@@ -370,206 +354,251 @@
       const replayBtn = document.getElementById("replayAudioBtn");
       const audioStatusMsg = document.getElementById("audioStatusMsg");
 
-      // Helper: update status message
+      // Helper: update status message with optional error styling
       function setStatusMessage(msg, isError = false) {
         audioStatusMsg.textContent = msg;
         audioStatusMsg.style.color = isError ? "#e11d48" : "#4b5563";
         if (!isError) {
+          // revert after 2.5 seconds only if message hasn't changed
           setTimeout(() => {
-            if (audioStatusMsg.textContent === msg)
+            if (audioStatusMsg.textContent === msg) {
               audioStatusMsg.style.color = "#6c7a8e";
-          }, 2000);
+            }
+          }, 2500);
         }
       }
 
-      // Initialize or reload audio player for a given audio URL
-      function loadAudio(url) {
+      // Helper: Get clean file name from path for debugging
+      function getFileNameFromPath(path) {
+        return path.split("/").pop();
+      }
+
+      // Load a local audio file into the player
+      // Completely rewritten to handle local file paths correctly
+      function loadLocalAudio(filePath) {
+        // Clean up previous audio player
         if (audioPlayer) {
           audioPlayer.pause();
-          audioPlayer.src = "";
-          // remove old event listeners to avoid duplicates
+          // Remove all event listeners to avoid memory leaks
           audioPlayer.onended = null;
           audioPlayer.onerror = null;
+          audioPlayer.oncanplay = null;
           audioPlayer.oncanplaythrough = null;
+          audioPlayer.onloadstart = null;
+          audioPlayer.src = "";
         }
-        audioPlayer = new Audio(url);
-        currentAudioSrc = url;
 
-        // event: when audio finishes playing, reset status but no action needed
+        // Create new Audio object with local file path
+        // Using 'new Audio()' works perfectly with relative/absolute local paths
+        audioPlayer = new Audio(filePath);
+        currentAudioSrc = filePath;
+
+        // --- Event handlers for local file playback ---
+        audioPlayer.onloadstart = () => {
+          setStatusMessage(
+            `📂 Loading local file: ${getFileNameFromPath(filePath)}...`
+          );
+        };
+
+        audioPlayer.oncanplay = () => {
+          setStatusMessage(`✅ Local audio ready: "${words[currentIndex][0]}"`);
+        };
+
+        audioPlayer.oncanplaythrough = () => {
+          // Audio is buffered enough to play fully
+          setStatusMessage(
+            `🎧 Ready to play "${words[currentIndex][0]}" from local storage`
+          );
+        };
+
         audioPlayer.onended = () => {
           setStatusMessage(`✓ Finished playing "${words[currentIndex][0]}"`);
         };
 
         audioPlayer.onerror = (e) => {
-          console.warn("Audio load error", e);
+          const error = audioPlayer.error;
+          let errorMsg = "";
+          if (error) {
+            switch (error.code) {
+              case MediaError.MEDIA_ERR_ABORTED:
+                errorMsg = "Playback aborted";
+                break;
+              case MediaError.MEDIA_ERR_NETWORK:
+                errorMsg = "Network error (check file path)";
+                break;
+              case MediaError.MEDIA_ERR_DECODE:
+                errorMsg = "Decoding error (unsupported format)";
+                break;
+              case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                errorMsg = `File not found or unsupported: ${getFileNameFromPath(
+                  filePath
+                )}`;
+                break;
+              default:
+                errorMsg = "Unknown audio error";
+            }
+          } else {
+            errorMsg = `Cannot load local file: ${getFileNameFromPath(
+              filePath
+            )}`;
+          }
           setStatusMessage(
-            `⚠️ Cannot play audio for "${words[currentIndex][0]}". Check URL.`,
+            `❌ ${errorMsg} — check if file exists at: ${filePath}`,
             true
           );
+          console.error("Audio load error:", error, "path:", filePath);
         };
 
-        audioPlayer.oncanplaythrough = () => {
-          setStatusMessage(`🎵 Ready: "${words[currentIndex][0]}"`);
-        };
-
-        // preload metadata
+        // Trigger load
         audioPlayer.load();
-        setStatusMessage(`📀 Loaded audio for "${words[currentIndex][0]}"`);
+
+        // Brief success message about local file path
+        setStatusMessage(
+          `📁 Local file loaded: ${getFileNameFromPath(filePath)}`
+        );
       }
 
-      // Update entire UI: dropdown selection, word display, audio source
+      // Update entire UI: dropdown, word display, and load local audio
       function updateUIAndAudio() {
-        // safety clamp index
+        // Clamp index
         if (currentIndex < 0) currentIndex = 0;
         if (currentIndex >= words.length) currentIndex = words.length - 1;
 
         const selectedWordData = words[currentIndex];
         const word = selectedWordData[0];
-        const audioSrc = selectedWordData[1];
+        const audioFilePath = selectedWordData[1];
 
         // Update displayed word
         currentWordDisplay.textContent = word;
 
-        // Update dropdown selection without triggering infinite event loop
+        // Update dropdown selection without triggering event loop
         if (dropdown.value !== word) {
           dropdown.value = word;
         }
 
-        // load new audio only if src changed (or audioPlayer is null)
-        if (!audioPlayer || currentAudioSrc !== audioSrc) {
-          loadAudio(audioSrc);
+        // Load local audio (only if src changed or player missing)
+        if (!audioPlayer || currentAudioSrc !== audioFilePath) {
+          loadLocalAudio(audioFilePath);
         } else {
-          // ensure status message shows current word ready (audio already loaded)
-          setStatusMessage(`🎧 Current: "${word}"`);
+          setStatusMessage(`🎵 "${word}" — local file ready`);
         }
 
-        // enable/disable nav buttons at edges
+        // Enable/disable nav buttons at edges
         prevBtn.disabled = currentIndex === 0;
         nextBtn.disabled = currentIndex === words.length - 1;
-        // style disabled state
-        prevBtn.style.opacity = prevBtn.disabled ? "0.5" : "1";
-        nextBtn.style.opacity = nextBtn.disabled ? "0.5" : "1";
-        prevBtn.style.cursor = prevBtn.disabled ? "not-allowed" : "pointer";
-        nextBtn.style.cursor = nextBtn.disabled ? "not-allowed" : "pointer";
       }
 
-      // Change to specific index and refresh
+      // Change to specific index
       function setCurrentIndex(newIndex) {
         if (newIndex < 0 || newIndex >= words.length) return;
         if (currentIndex === newIndex) return;
         currentIndex = newIndex;
         updateUIAndAudio();
-        // optional: auto-stop playing when switching words? better UX: pause any ongoing playback
+
+        // Pause any ongoing playback when switching words (better UX)
         if (audioPlayer && !audioPlayer.paused) {
           audioPlayer.pause();
-          setStatusMessage(
-            `⏸ Paused when switching to "${words[currentIndex][0]}"`
-          );
+          setStatusMessage(`⏸ Paused, now showing "${words[currentIndex][0]}"`);
         }
       }
 
-      // Play current audio
+      // ---------- Audio Control Functions (local file focused) ----------
       function playAudio() {
         if (!audioPlayer) {
-          setStatusMessage("⏳ Audio not ready, reloading...", false);
-          updateUIAndAudio(); // reinitializes
+          setStatusMessage("⏳ Audio not initialized, reloading...", false);
+          updateUIAndAudio();
           setTimeout(() => {
             if (audioPlayer) {
-              audioPlayer
-                .play()
-                .then(() => {
-                  setStatusMessage(
-                    `▶ Now playing: "${words[currentIndex][0]}"`
-                  );
-                })
-                .catch((err) => {
-                  console.error("Playback error", err);
-                  setStatusMessage(`🚫 Play failed: ${err.message}`, true);
-                });
+              playAudio();
             }
-          }, 50);
+          }, 80);
           return;
         }
-        // Resume or play
-        audioPlayer
-          .play()
-          .then(() => {
-            setStatusMessage(
-              `🔊 Playing "${words[currentIndex][originalIndex]}"`
-            );
-          })
-          .catch((err) => {
-            // auto error might be due to network: try reload once
-            console.warn("play error, reloading audio", err);
-            setStatusMessage(`⚠️ Retry loading audio...`, true);
-            loadAudio(words[currentIndex][1]);
-            setTimeout(() => {
-              if (audioPlayer) {
-                audioPlayer
-                  .play()
-                  .catch((e) =>
-                    setStatusMessage(`Cannot play audio: ${e.message}`, true)
-                  );
+
+        // Use Promise catch for autoplay policies / local file errors
+        const playPromise = audioPlayer.play();
+
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setStatusMessage(
+                `🔊 Now playing "${words[currentIndex][0]}" from local file`
+              );
+            })
+            .catch((err) => {
+              console.warn("Playback error on local file:", err);
+              // Common issues: file not found, unsupported format, or autoplay blocked
+              let friendlyMsg = `Cannot play local file. `;
+              if (err.name === "NotSupportedError") {
+                friendlyMsg += `Format not supported: ${getFileNameFromPath(
+                  words[currentIndex][1]
+                )}`;
+              } else if (err.name === "NotAllowedError") {
+                friendlyMsg += `User interaction required first. Click Play again.`;
+              } else {
+                friendlyMsg += `File missing? Check path: ${words[currentIndex][1]}`;
               }
-            }, 100);
-          });
-        // capture original word for message
-        const originalIndex = currentIndex;
-        audioPlayer.onplay = () => {
-          if (currentIndex === originalIndex)
-            setStatusMessage(`🎶 Playing "${words[currentIndex][0]}"`);
-        };
+              setStatusMessage(`❌ ${friendlyMsg}`, true);
+            });
+        }
       }
 
-      // Pause current audio
       function pauseAudio() {
         if (audioPlayer && !audioPlayer.paused) {
           audioPlayer.pause();
           setStatusMessage(`⏸ Paused "${words[currentIndex][0]}"`);
         } else if (audioPlayer && audioPlayer.paused) {
-          setStatusMessage(`⏸ Already paused`, false);
+          setStatusMessage(`⏸ Already paused (local audio)`);
         } else {
-          setStatusMessage(`No active audio`, false);
+          setStatusMessage(`No active audio loaded`);
         }
       }
 
-      // Replay: reset to start and play
       function replayAudio() {
         if (!audioPlayer) {
+          setStatusMessage(`⏳ Loading audio first...`);
           updateUIAndAudio();
-          setTimeout(() => replayAudio(), 80);
+          setTimeout(() => replayAudio(), 100);
           return;
         }
-        // reset to beginning
+
+        // Reset to beginning and play
         audioPlayer.currentTime = 0;
-        // if it was paused, just play
-        audioPlayer
-          .play()
-          .then(() => {
-            setStatusMessage(`🔄 Replaying "${words[currentIndex][0]}"`);
-          })
-          .catch((err) => {
-            console.error("replay failed", err);
-            setStatusMessage(`Replay error, retrying...`, true);
-            // attempt to reload audio from scratch
-            loadAudio(words[currentIndex][1]);
-            setTimeout(() => {
-              if (audioPlayer) {
-                audioPlayer.currentTime = 0;
-                audioPlayer
-                  .play()
-                  .catch((e) =>
-                    setStatusMessage(`Cannot replay: ${e.message}`, true)
-                  );
-              }
-            }, 100);
-          });
+
+        const playPromise = audioPlayer.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setStatusMessage(
+                `🔄 Replaying "${words[currentIndex][0]}" from local file`
+              );
+            })
+            .catch((err) => {
+              console.error("Replay failed on local file:", err);
+              setStatusMessage(
+                `⚠️ Replay error: file might be missing or invalid`,
+                true
+              );
+              // Attempt to reload audio completely
+              loadLocalAudio(words[currentIndex][1]);
+              setTimeout(() => {
+                if (audioPlayer) {
+                  audioPlayer.currentTime = 0;
+                  audioPlayer
+                    .play()
+                    .catch((e) =>
+                      setStatusMessage(`Retry failed: ${e.message}`, true)
+                    );
+                }
+              }, 120);
+            });
+        }
       }
 
-      // Populate dropdown with all words, preserve current selection
+      // ---------- Dropdown population ----------
       function populateDropdown() {
         dropdown.innerHTML = "";
-        words.forEach((item, idx) => {
+        words.forEach((item) => {
           const option = document.createElement("option");
           option.value = item[0];
           option.textContent = item[0];
@@ -578,7 +607,7 @@
         dropdown.value = words[currentIndex][0];
       }
 
-      // Event: dropdown change
+      // ---------- Event Handlers ----------
       function onDropdownChange(e) {
         const selectedWord = e.target.value;
         const foundIndex = words.findIndex((item) => item[0] === selectedWord);
@@ -587,7 +616,6 @@
         }
       }
 
-      // Previous button handler
       function onPrev() {
         if (currentIndex > 0) {
           setCurrentIndex(currentIndex - 1);
@@ -596,7 +624,6 @@
         }
       }
 
-      // Next button handler
       function onNext() {
         if (currentIndex < words.length - 1) {
           setCurrentIndex(currentIndex + 1);
@@ -605,14 +632,33 @@
         }
       }
 
-      // helper for initial load & optional page visibility / cleanup but no memory leaks
+      // ----- Helper: Show folder setup hint on console once -----
+      function showLocalFileHint() {
+        console.log("===== LOCAL AUDIO SETUP =====");
+        console.log(
+          "Update the 'words' array with your local audio file paths."
+        );
+        console.log("Example structure:");
+        words.forEach((w) => {
+          console.log(`  "${w[0]}" → ${w[1]}`);
+        });
+        console.log(
+          "If files are missing, you'll see an error in the status bar."
+        );
+        console.log(
+          "Create an 'audio' folder and place .mp3/.wav/.ogg files there."
+        );
+        console.log("============================");
+      }
+
+      // ----- Initialization -----
       function initApp() {
         populateDropdown();
-        // set first index 0 and load
+        // Start with first word
         currentIndex = 0;
         updateUIAndAudio();
 
-        // attach event listeners
+        // Attach event listeners
         dropdown.addEventListener("change", onDropdownChange);
         prevBtn.addEventListener("click", onPrev);
         nextBtn.addEventListener("click", onNext);
@@ -620,7 +666,7 @@
         pauseBtn.addEventListener("click", pauseAudio);
         replayBtn.addEventListener("click", replayAudio);
 
-        // handle page visibility / clean up on page unload (optional)
+        // Clean up on page unload
         window.addEventListener("beforeunload", () => {
           if (audioPlayer) {
             audioPlayer.pause();
@@ -628,44 +674,34 @@
           }
         });
 
-        // additional robustness: if audio fails due to CORS or network we already show error
-        setStatusMessage("✅ Ready — select word or use buttons");
+        setStatusMessage(
+          `✅ Local audio player ready — ${words.length} words loaded`
+        );
+        showLocalFileHint();
+
+        // Extra: add example note if files likely missing (just informative)
+        setTimeout(() => {
+          // Check if first audio file might be missing (no automatic fetch, just friendly reminder)
+          setStatusMessage(
+            `💡 Tip: Place audio files at paths shown below each word`,
+            false
+          );
+        }, 1500);
       }
 
-      // Edge case: make sure audio context not blocked by browser policy (user interaction)
-      // Browsers allow Audio after user interaction but we can just preload. The play/pause buttons
-      // are user-initiated, so fine.
-
-      // start everything once DOM ready
+      // Start everything after DOM ready
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", initApp);
       } else {
         initApp();
       }
 
-      // Additional fix: Some browsers might not auto-play until user interaction, but all audio
-      // controls are user-initiated, so fine. And we preload but not autoplay.
-      // For better responsiveness, if the user uses dropdown or prev/next, audio loads silently.
-      // No autoplay on page load => good.
-
-      // Enhance responsiveness: listen to touch events and buttons active states fine.
-      // For replay: ensure we don't double trigger.
-
-      // Edge handling: if audio src fails to load due to external network, we let user know but
-      // app still functional.
-      // For demo robustness I used SoundHelix examples which are valid https mp3 files (CORS friendly)
-      // They are long music clips, but it demonstrates audio playback capability.
-      // In a real product, you would replace with actual pronunciation files.
-
-      // Provide alternative if any network error: Status messages show errors and retry.
-      // Ensure drop-down selection sync with external changes.
-
-      // Expose for debugging but not needed
-      window.debugWordApp = {
-        getIndex: () => currentIndex,
+      // Optional: expose for debugging (dev only)
+      window.localAudioHelper = {
         reload: updateUIAndAudio,
+        getCurrentPath: () => words[currentIndex][1],
+        listWords: words,
       };
     </script>
   </body>
 </html>
-```
