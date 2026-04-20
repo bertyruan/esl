@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
-    <title>Word Audio Player | Local Files</title>
+    <title>单词高亮播放器 | 音频联动逐字母动画</title>
     <style>
       * {
         margin: 0;
@@ -27,7 +27,7 @@
       }
 
       .card {
-        max-width: 680px;
+        max-width: 720px;
         width: 100%;
         background: rgba(255, 255, 255, 0.96);
         border-radius: 56px;
@@ -41,13 +41,13 @@
         padding: 2rem 1.8rem 2.2rem;
       }
 
-      /* section 1: dropdown */
+      /* 下拉菜单区域 */
       .selector-section {
         margin-bottom: 2rem;
       }
 
       .selector-label {
-        font-size: 1.2rem;
+        font-size: 0.85rem;
         text-transform: uppercase;
         letter-spacing: 1.5px;
         font-weight: 600;
@@ -59,7 +59,7 @@
       .custom-select {
         width: 100%;
         padding: 0.9rem 1.2rem;
-        font-size: 1.5rem;
+        font-size: 1rem;
         font-weight: 500;
         background-color: #ffffff;
         border: 2px solid #e2e8f0;
@@ -80,11 +80,11 @@
         box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
       }
 
-      /* section 2: prev/next buttons */
+      /* 上一页/下一页按钮 */
       .nav-section {
         display: flex;
         gap: 1rem;
-        margin-bottom: 2.2rem;
+        margin-bottom: 2rem;
       }
 
       .nav-btn {
@@ -122,7 +122,7 @@
         cursor: not-allowed;
       }
 
-      /* main display area */
+      /* 主显示区域 - 字母高亮 */
       .word-display {
         background: linear-gradient(135deg, #fafcff 0%, #ffffff 100%);
         border-radius: 48px;
@@ -134,37 +134,65 @@
         border: 1px solid rgba(148, 163, 184, 0.15);
       }
 
-      .current-word {
+      /* 单词字母容器 */
+      .word-letter-container {
         font-size: clamp(2.4rem, 10vw, 4.5rem);
         font-weight: 800;
-        letter-spacing: 0.6rem;
-        background: linear-gradient(120deg, #0f172a, #334155);
-        background-clip: text;
-        -webkit-background-clip: text;
-        color: transparent;
-        margin-bottom: 1.2rem;
+        letter-spacing: 0.02em;
+        margin-bottom: 1.5rem;
         word-break: break-word;
+        line-height: 1.3;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.05em;
       }
 
-      /* audio control buttons */
+      .letter-span {
+        display: inline-block;
+        transition: all 0.2s ease;
+        padding: 0 0.02em;
+        border-radius: 12px;
+        color: #1e293b;
+      }
+
+      /* 高亮样式 */
+      .letter-highlight {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: #0f172a;
+        text-shadow: 0 1px 2px rgba(255, 255, 200, 0.5);
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+      }
+
+      .word-highlight-all {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        border-radius: 20px;
+        padding: 0 0.15em;
+        transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      }
+
+      /* 音频控制按钮 */
       .audio-controls {
         display: flex;
         justify-content: center;
-        gap: 1.2rem;
+        gap: 1rem;
         flex-wrap: wrap;
-        margin-top: 0.8rem;
+        margin: 0.5rem 0 1rem;
       }
 
       .audio-btn {
         background: white;
         border: none;
-        padding: 0.8rem 1.6rem;
+        padding: 0.7rem 1.4rem;
         border-radius: 60px;
-        font-size: 1rem;
+        font-size: 0.95rem;
         font-weight: 600;
         display: inline-flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
         cursor: pointer;
         transition: all 0.2s ease;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
@@ -173,14 +201,13 @@
       }
 
       .audio-btn:active {
-        transform: scale(0.94);
+        transform: scale(0.95);
       }
 
       .play-btn {
         background: #8b5cf6;
         border-color: #7c3aed;
         color: white;
-        box-shadow: 0 6px 14px rgba(139, 92, 246, 0.3);
       }
 
       .play-btn:hover {
@@ -188,48 +215,65 @@
         transform: translateY(-2px);
       }
 
-      .pause-btn {
-        background: #f8fafc;
-      }
-
-      .pause-btn:hover {
-        background: #f1f5f9;
-      }
-
+      .pause-btn,
       .replay-btn {
         background: #f8fafc;
       }
 
+      .pause-btn:hover,
       .replay-btn:hover {
         background: #f1f5f9;
       }
 
-      .audio-status {
+      /* 高亮开关按钮 - 替换原来的两个按钮 */
+      .toggle-highlight-btn {
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-color: #047857;
+        color: white;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        min-width: 160px;
+      }
+
+      .toggle-highlight-btn.off {
+        background: linear-gradient(135deg, #6b7280, #4b5563);
+        border-color: #374151;
+        box-shadow: none;
+      }
+
+      .toggle-highlight-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.05);
+      }
+
+      .status-area {
         font-size: 0.75rem;
         color: #6c7a8e;
         margin-top: 1rem;
         text-align: center;
-        display: none;
       }
 
-      /* local file hint */
-      .local-hint {
-        background: #f1f4f9;
-        border-radius: 20px;
-        padding: 0.6rem 1rem;
-        margin-top: 1rem;
+      .progress-info {
         font-size: 0.7rem;
-        color: #4b5563;
-        text-align: center;
-        border: 1px solid #e2e8f0;
+        background: #f1f5f9;
+        display: inline-block;
+        padding: 0.2rem 0.8rem;
+        border-radius: 30px;
+        margin-top: 0.5rem;
       }
 
-      .local-hint code {
-        background: #e2e8f0;
-        padding: 0.2rem 0.4rem;
-        border-radius: 12px;
-        font-family: monospace;
-        font-size: 0.7rem;
+      .highlight-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 10px;
+        background-color: #10b981;
+        margin-right: 6px;
+        box-shadow: 0 0 4px #10b981;
+      }
+
+      .highlight-indicator.off {
+        background-color: #9ca3af;
+        box-shadow: none;
       }
 
       @media (max-width: 550px) {
@@ -237,18 +281,14 @@
           padding: 1.5rem 1.2rem;
         }
         .audio-btn {
-          padding: 0.65rem 1.2rem;
-          font-size: 0.9rem;
+          padding: 0.55rem 1rem;
+          font-size: 0.85rem;
         }
-        .audio-controls {
-          gap: 0.8rem;
+        .word-letter-container {
+          font-size: clamp(1.8rem, 8vw, 3rem);
         }
-        .nav-btn {
-          padding: 0.65rem 0;
-          font-size: 0.9rem;
-        }
-        .word-display {
-          padding: 1.5rem 1rem;
+        .toggle-highlight-btn {
+          min-width: 140px;
         }
       }
 
@@ -262,42 +302,39 @@
         text-align: center;
         font-size: 0.7rem;
         color: #94a3b8;
-        margin-top: 1.5rem;
+        margin-top: 1rem;
       }
 
-      h2 {
-        margin-bottom: 1rem;
-        text-align: center;
+      .highlight-controls {
+        display: flex;
+        justify-content: center;
+        margin-top: 0.8rem;
       }
     </style>
   </head>
   <body>
     <div class="card">
       <div class="container">
-        <h2>复习自然拼读和口语</h2>
-        <!-- Section 1: Dropdown menu listing all words -->
+        <!-- 区域1：下拉菜单 -->
         <div class="selector-section">
-          <span class="selector-label">📖 选字</span>
+          <span class="selector-label">📖 选择单词</span>
           <select
             id="wordDropdown"
             class="custom-select"
-            aria-label="Word list dropdown"
+            aria-label="单词列表"
           ></select>
         </div>
 
-        <!-- Section 2: Previous / Next buttons -->
+        <!-- 区域2：上一个/下一个按钮 -->
         <div class="nav-section">
-          <button id="prevBtn" class="nav-btn" aria-label="Previous word">
-            ◀ 上一个
-          </button>
-          <button id="nextBtn" class="nav-btn" aria-label="Next word">
-            下一个 ▶
-          </button>
+          <button id="prevBtn" class="nav-btn">◀ 上一个</button>
+          <button id="nextBtn" class="nav-btn">下一个 ▶</button>
         </div>
 
-        <!-- Section 3: Main UI - current word + local audio controls -->
+        <!-- 区域3：主界面 - 单词显示 + 音频联动高亮 -->
         <div class="word-display">
-          <div class="current-word" id="currentWordDisplay">—</div>
+          <div id="wordLetterContainer" class="word-letter-container"></div>
+
           <div class="audio-controls">
             <button id="playAudioBtn" class="audio-btn play-btn">▶ 播放</button>
             <button id="pauseAudioBtn" class="audio-btn pause-btn">
@@ -307,295 +344,490 @@
               ⟳ 重放
             </button>
           </div>
-          <div id="audioStatusMsg" class="audio-status">🎵 音频已就绪</div>
-          <!-- <div class="local-hint">
-            💡 <strong>Local audio files</strong><br />
-            Each word uses a local file path (e.g.,
-            <code>./audio/word.mp3</code>).<br />
-            Place your audio files in the <code>audio/</code> folder or update
-            the paths below.
-          </div> -->
+
+          <div class="highlight-controls">
+            <button
+              id="toggleHighlightBtn"
+              class="audio-btn toggle-highlight-btn"
+            >
+              <span id="toggleIcon">✨</span>
+              <span id="toggleText">高亮已开启</span>
+            </button>
+          </div>
+
+          <div id="highlightStatus" class="status-area">
+            <span id="statusMessage"
+              >🎵 点击播放按钮，高亮将随音频自动开始</span
+            >
+            <div id="progressIndicator" class="progress-info"></div>
+          </div>
         </div>
-        <footer>练习自然拼读</footer>
+        <footer>
+          高亮与音频联动 • 播放时自动逐字母高亮 • 暂停时动画暂停 •
+          重放时重置高亮
+        </footer>
       </div>
     </div>
 
     <script>
-      // ==================================================================
-      // DATA STRUCTURE: list named 'words' containing [word, audio_file]
-      // audio_file is now a LOCAL FILE PATH (relative or absolute)
-      // ==================================================================
-      // IMPORTANT: Replace these paths with your actual local audio files.
-      // Example: "./audio/cat.mp3", "../sounds/dog.wav", "/media/hello.ogg"
-      // For demo purposes, I'm using relative paths that you can customize.
-      // To make this fully functional, create an "audio" folder and place files.
-      // ==================================================================
+      // ================================================================
+      // 数据：单词列表，格式为 [单词, 本地音频文件路径]
+      // 注意：以下 'words' 变量中的英文单词保持不变，仅界面文字为中文
+      // ================================================================
+      const words = [
+        [" but", "audio/1.m4a"],
+        [" bit", "audio/2.m4a"],
+        [" bat", "audio/3.m4a"],
+        [" bot", "audio/4.m4a"],
+        [" cut", "audio/5.m4a"],
+        [" pit", "audio/6.m4a"],
+        [" hat", "audio/7.m4a"],
+        [" dot", "audio/8.m4a"],
+      ];
 
-      const words = [["rag", "./audio/1.m4a"]];
+      // ---------------------- 全局状态 --------------------------
+      let currentIndex = 0; // 当前选中的单词索引
+      let audioPlayer = null; // 音频播放器实例
+      let currentAudioSrc = null; // 当前音频源路径
 
-      // ----- Helper: Check if running in a local file environment -----
-      // Provide fallback instructions if files don't exist.
+      // 高亮动画状态
+      let highlightTimer = null; // 定时器ID
+      let currentHighlightStep = 0; // 当前高亮到的字母索引
+      let isHighlightingActive = false; // 是否正在执行高亮动画（动画进行中）
+      let highlightEnabled = true; // 高亮功能总开关（用户通过toggle按钮控制）
+      let animationPausedByAudio = false; // 是否因音频暂停而暂停动画
 
-      // ----- Application State -----
-      let currentIndex = 0; // index of currently selected word
-      let audioPlayer = null; // HTMLAudioElement instance
-      let currentAudioSrc = null; // store current src path
+      let wordLettersSpans = []; // 每个字母的DOM元素数组
 
-      // DOM elements
+      // DOM 元素
       const dropdown = document.getElementById("wordDropdown");
       const prevBtn = document.getElementById("prevBtn");
       const nextBtn = document.getElementById("nextBtn");
-      const currentWordDisplay = document.getElementById("currentWordDisplay");
+      const wordLetterContainer = document.getElementById(
+        "wordLetterContainer"
+      );
       const playBtn = document.getElementById("playAudioBtn");
       const pauseBtn = document.getElementById("pauseAudioBtn");
       const replayBtn = document.getElementById("replayAudioBtn");
-      const audioStatusMsg = document.getElementById("audioStatusMsg");
+      const toggleHighlightBtn = document.getElementById("toggleHighlightBtn");
+      const toggleIcon = document.getElementById("toggleIcon");
+      const toggleText = document.getElementById("toggleText");
+      const statusMessageSpan = document.getElementById("statusMessage");
+      const progressIndicator = document.getElementById("progressIndicator");
 
-      // Helper: update status message with optional error styling
+      // 辅助函数：更新状态栏消息
       function setStatusMessage(msg, isError = false) {
-        audioStatusMsg.textContent = msg;
-        audioStatusMsg.style.color = isError ? "#e11d48" : "#4b5563";
+        statusMessageSpan.textContent = msg;
+        statusMessageSpan.style.color = isError ? "#e11d48" : "#4b5563";
         if (!isError) {
-          // revert after 2.5 seconds only if message hasn't changed
           setTimeout(() => {
-            if (audioStatusMsg.textContent === msg) {
-              audioStatusMsg.style.color = "#6c7a8e";
+            if (statusMessageSpan.textContent === msg) {
+              statusMessageSpan.style.color = "#6c7a8e";
             }
           }, 2500);
         }
       }
 
-      // Helper: Get clean file name from path for debugging
-      function getFileNameFromPath(path) {
-        return path.split("/").pop();
-      }
-
-      // Load a local audio file into the player
-      // Completely rewritten to handle local file paths correctly
-      function loadLocalAudio(filePath) {
-        // Clean up previous audio player
-        if (audioPlayer) {
-          audioPlayer.pause();
-          // Remove all event listeners to avoid memory leaks
-          audioPlayer.onended = null;
-          audioPlayer.onerror = null;
-          audioPlayer.oncanplay = null;
-          audioPlayer.oncanplaythrough = null;
-          audioPlayer.onloadstart = null;
-          audioPlayer.src = "";
+      // 辅助函数：更新进度显示
+      function updateProgressText(currentLetter, totalLetters) {
+        if (totalLetters === 0) {
+          progressIndicator.textContent = "";
+          return;
         }
-
-        // Create new Audio object with local file path
-        // Using 'new Audio()' works perfectly with relative/absolute local paths
-        audioPlayer = new Audio(filePath);
-        currentAudioSrc = filePath;
-
-        // --- Event handlers for local file playback ---
-        audioPlayer.onloadstart = () => {
-          setStatusMessage(
-            `📂 Loading local file: ${getFileNameFromPath(filePath)}...`
-          );
-        };
-
-        audioPlayer.oncanplay = () => {
-          setStatusMessage(`✅ Local audio ready: "${words[currentIndex][0]}"`);
-        };
-
-        audioPlayer.oncanplaythrough = () => {
-          // Audio is buffered enough to play fully
-          setStatusMessage(
-            `🎧 Ready to play "${words[currentIndex][0]}" from local storage`
-          );
-        };
-
-        audioPlayer.onended = () => {
-          setStatusMessage(`✓ Finished playing "${words[currentIndex][0]}"`);
-        };
-
-        audioPlayer.onerror = (e) => {
-          const error = audioPlayer.error;
-          let errorMsg = "";
-          if (error) {
-            switch (error.code) {
-              case MediaError.MEDIA_ERR_ABORTED:
-                errorMsg = "Playback aborted";
-                break;
-              case MediaError.MEDIA_ERR_NETWORK:
-                errorMsg = "Network error (check file path)";
-                break;
-              case MediaError.MEDIA_ERR_DECODE:
-                errorMsg = "Decoding error (unsupported format)";
-                break;
-              case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                errorMsg = `File not found or unsupported: ${getFileNameFromPath(
-                  filePath
-                )}`;
-                break;
-              default:
-                errorMsg = "Unknown audio error";
-            }
-          } else {
-            errorMsg = `Cannot load local file: ${getFileNameFromPath(
-              filePath
-            )}`;
-          }
-          setStatusMessage(
-            `❌ ${errorMsg} — check if file exists at: ${filePath}`,
-            true
-          );
-          console.error("Audio load error:", error, "path:", filePath);
-        };
-
-        // Trigger load
-        audioPlayer.load();
-
-        // Brief success message about local file path
-        setStatusMessage(
-          `📁 Local file loaded: ${getFileNameFromPath(filePath)}`
-        );
-      }
-
-      // Update entire UI: dropdown, word display, and load local audio
-      function updateUIAndAudio() {
-        // Clamp index
-        if (currentIndex < 0) currentIndex = 0;
-        if (currentIndex >= words.length) currentIndex = words.length - 1;
-
-        const selectedWordData = words[currentIndex];
-        const word = selectedWordData[0];
-        const audioFilePath = selectedWordData[1];
-
-        // Update displayed word
-        currentWordDisplay.textContent = word;
-
-        // Update dropdown selection without triggering event loop
-        if (dropdown.value !== word) {
-          dropdown.value = word;
+        if (!highlightEnabled) {
+          progressIndicator.textContent = "🔘 高亮功能已关闭";
+          return;
         }
-
-        // Load local audio (only if src changed or player missing)
-        if (!audioPlayer || currentAudioSrc !== audioFilePath) {
-          loadLocalAudio(audioFilePath);
+        if (currentLetter < totalLetters && currentLetter >= 0) {
+          progressIndicator.textContent = `📝 高亮进度: ${
+            currentLetter + 1
+          }/${totalLetters}`;
+        } else if (currentLetter === totalLetters && totalLetters > 0) {
+          progressIndicator.textContent = `✨ 单词高亮完成！ ✨`;
         } else {
-          setStatusMessage(`🎵 "${word}" — local file ready`);
-        }
-
-        // Enable/disable nav buttons at edges
-        prevBtn.disabled = currentIndex === 0;
-        nextBtn.disabled = currentIndex === words.length - 1;
-      }
-
-      // Change to specific index
-      function setCurrentIndex(newIndex) {
-        if (newIndex < 0 || newIndex >= words.length) return;
-        if (currentIndex === newIndex) return;
-        currentIndex = newIndex;
-        updateUIAndAudio();
-
-        // Pause any ongoing playback when switching words (better UX)
-        if (audioPlayer && !audioPlayer.paused) {
-          audioPlayer.pause();
-          setStatusMessage(`⏸ Paused, now showing "${words[currentIndex][0]}"`);
+          progressIndicator.textContent = "";
         }
       }
 
-      // ---------- Audio Control Functions (local file focused) ----------
-      function playAudio() {
-        if (!audioPlayer) {
-          setStatusMessage("⏳ Audio not initialized, reloading...", false);
-          updateUIAndAudio();
-          setTimeout(() => {
-            if (audioPlayer) {
-              playAudio();
-            }
-          }, 80);
+      // 更新toggle按钮的UI
+      function updateToggleButtonUI() {
+        if (highlightEnabled) {
+          toggleIcon.textContent = "✨";
+          toggleText.textContent = "高亮已开启";
+          toggleHighlightBtn.classList.remove("off");
+          toggleHighlightBtn.style.background =
+            "linear-gradient(135deg, #10b981, #059669)";
+        } else {
+          toggleIcon.textContent = "🚫";
+          toggleText.textContent = "高亮已关闭";
+          toggleHighlightBtn.classList.add("off");
+          toggleHighlightBtn.style.background =
+            "linear-gradient(135deg, #6b7280, #4b5563)";
+        }
+      }
+
+      // ---------------------- 核心高亮功能 ----------------------
+      // 清除所有高亮样式
+      function resetAllHighlights() {
+        if (!wordLettersSpans.length) return;
+        wordLettersSpans.forEach((span) => {
+          span.classList.remove("letter-highlight");
+          span.classList.remove("word-highlight-all");
+        });
+      }
+
+      // 停止动画（清除定时器，重置内部标志）
+      function stopHighlightAnimation(resetStep = true) {
+        if (highlightTimer) {
+          clearTimeout(highlightTimer);
+          highlightTimer = null;
+        }
+        isHighlightingActive = false;
+        if (resetStep) {
+          currentHighlightStep = 0;
+        }
+        animationPausedByAudio = false;
+      }
+
+      // 完全重置高亮（停止动画 + 清除所有高亮样式）
+      function resetHighlightCompletely() {
+        stopHighlightAnimation(true);
+        resetAllHighlights();
+        if (highlightEnabled) {
+          setStatusMessage("高亮已重置");
+        }
+        updateProgressText(0, wordLettersSpans.length);
+      }
+
+      // 核心动画：逐字母高亮（从当前step开始，继续执行）
+      // 如果 alreadyStarted=true 表示是恢复动画，不要重置已有高亮
+      function startOrResumeHighlightAnimation(resetFromBeginning = false) {
+        // 如果高亮功能被关闭，不执行任何动画
+        if (!highlightEnabled) {
           return;
         }
 
-        // Use Promise catch for autoplay policies / local file errors
-        const playPromise = audioPlayer.play();
-
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              setStatusMessage(
-                `🔊 Now playing "${words[currentIndex][0]}" from local file`
-              );
-            })
-            .catch((err) => {
-              console.warn("Playback error on local file:", err);
-              // Common issues: file not found, unsupported format, or autoplay blocked
-              let friendlyMsg = `Cannot play local file. `;
-              if (err.name === "NotSupportedError") {
-                friendlyMsg += `Format not supported: ${getFileNameFromPath(
-                  words[currentIndex][1]
-                )}`;
-              } else if (err.name === "NotAllowedError") {
-                friendlyMsg += `User interaction required first. Click Play again.`;
-              } else {
-                friendlyMsg += `File missing? Check path: ${words[currentIndex][1]}`;
-              }
-              setStatusMessage(`❌ ${friendlyMsg}`, true);
-            });
+        // 如果要求从头开始，重置step和高亮样式
+        if (resetFromBeginning) {
+          stopHighlightAnimation(true);
+          resetAllHighlights();
+          currentHighlightStep = 0;
         }
+
+        const letters = wordLettersSpans;
+        const totalLetters = letters.length + 1;
+        console.log(totalLetters);
+        if (totalLetters === 0) {
+          return;
+        }
+
+        // 如果已经完成了全部高亮（step >= totalLetters），不再重复开始
+        if (currentHighlightStep >= totalLetters) {
+          // 确保整个单词高亮样式存在
+          if (highlightEnabled) {
+            letters.forEach((span) => {
+              span.classList.remove("letter-highlight");
+              span.classList.add("word-highlight-all");
+            });
+            updateProgressText(totalLetters, totalLetters);
+          }
+          return;
+        }
+
+        // 如果已经有动画在运行，先停止再重新开始（避免重叠）
+        if (isHighlightingActive) {
+          stopHighlightAnimation(false); // 保留currentHighlightStep
+        }
+
+        isHighlightingActive = true;
+
+        // 定义递归高亮函数
+        function highlightNextLetter(stepIndex) {
+          // 动画被外部停止或高亮功能关闭时，退出
+          if (!isHighlightingActive || !highlightEnabled) {
+            return;
+          }
+
+          const lettersNow = wordLettersSpans;
+          const totalNow = lettersNow.length;
+
+          // 防止单词变化导致的索引越界
+          if (stepIndex >= totalNow) {
+            // 所有字母完成，高亮整个单词
+            lettersNow.forEach((span) => {
+              span.classList.remove("letter-highlight");
+              span.classList.add("word-highlight-all");
+            });
+            setStatusMessage(`🎉 单词 "${words[currentIndex][0]}" 高亮完成！`);
+            updateProgressText(totalNow, totalNow);
+            isHighlightingActive = false;
+            currentHighlightStep = totalNow;
+            highlightTimer = null;
+            return;
+          }
+
+          // 移除所有字母高亮和整词高亮（但保留之前完成状态）
+          lettersNow.forEach((span) => {
+            span.classList.remove("letter-highlight");
+            span.classList.remove("word-highlight-all");
+          });
+
+          // 高亮当前字母
+          lettersNow[stepIndex].classList.add("letter-highlight");
+          currentHighlightStep = stepIndex;
+          updateProgressText(stepIndex, totalNow);
+
+          // 调度下一个字母（1秒后）
+          highlightTimer = setTimeout(() => {
+            highlightNextLetter(stepIndex + 1);
+          }, 1000);
+        }
+
+        // 从 currentHighlightStep 开始
+        const startStep = currentHighlightStep;
+        // 先清除之前的定时器
+        if (highlightTimer) {
+          clearTimeout(highlightTimer);
+          highlightTimer = null;
+        }
+        highlightTimer = setTimeout(() => {
+          if (highlightEnabled && isHighlightingActive) {
+            highlightNextLetter(startStep);
+          }
+        }, 50);
+      }
+
+      // 暂停高亮动画（保留当前进度）
+      function pauseHighlightAnimation() {
+        if (isHighlightingActive) {
+          stopHighlightAnimation(false); // 保留 currentHighlightStep
+          animationPausedByAudio = true;
+          setStatusMessage(
+            `高亮动画已暂停，当前进度: 第 ${currentHighlightStep}/${wordLettersSpans.length} 个字母`
+          );
+        }
+      }
+
+      // 恢复高亮动画（从上次暂停处继续）
+      function resumeHighlightAnimation() {
+        if (!highlightEnabled) {
+          return;
+        }
+        if (
+          currentHighlightStep < wordLettersSpans.length &&
+          !isHighlightingActive
+        ) {
+          animationPausedByAudio = false;
+          startOrResumeHighlightAnimation(false); // 从当前step继续
+          setStatusMessage(
+            `恢复高亮动画，继续第 ${currentHighlightStep + 1}/${
+              wordLettersSpans.length
+            } 个字母`
+          );
+        } else if (currentHighlightStep >= wordLettersSpans.length) {
+          // 已经完成，不需要恢复
+          setStatusMessage(`单词高亮已完成`);
+        }
+      }
+
+      // 重置高亮并从头开始（用于重放或切换单词）
+      function resetAndStartHighlight() {
+        if (!highlightEnabled) {
+          resetHighlightCompletely();
+          return;
+        }
+        stopHighlightAnimation(true);
+        resetAllHighlights();
+        currentHighlightStep = 0;
+        startOrResumeHighlightAnimation(true);
+      }
+
+      // ---------------------- 音频联动逻辑 ----------------------
+      // 当音频开始播放时调用
+      function onAudioPlay() {
+        if (highlightEnabled) {
+          // 如果动画已完成（step >= 总长度），重置再开始
+          if (currentHighlightStep >= wordLettersSpans.length) {
+            resetAndStartHighlight();
+          } else if (!isHighlightingActive) {
+            // 动画未激活，恢复
+            resumeHighlightAnimation();
+          }
+          setStatusMessage(`▶ 播放中，高亮同步进行`);
+        } else {
+          setStatusMessage(`▶ 播放中（高亮功能已关闭）`);
+        }
+      }
+
+      // 当音频暂停时调用
+      function onAudioPause() {
+        if (highlightEnabled && isHighlightingActive) {
+          pauseHighlightAnimation();
+          setStatusMessage(`⏸ 音频暂停，高亮动画已暂停`);
+        }
+      }
+
+      // 当音频重放/重置时调用（重置到开头）
+      function onAudioReset() {
+        if (highlightEnabled) {
+          resetAndStartHighlight();
+          setStatusMessage(`⟳ 重放开始，高亮已重置并重新开始`);
+        } else {
+          resetHighlightCompletely();
+          setStatusMessage(`⟳ 重放开始（高亮功能已关闭）`);
+        }
+      }
+
+      // ---------------------- 切换高亮开关 ----------------------
+      function toggleHighlightFeature() {
+        highlightEnabled = !highlightEnabled;
+        updateToggleButtonUI();
+
+        if (!highlightEnabled) {
+          // 关闭高亮：停止动画，清除所有高亮样式
+          stopHighlightAnimation(true);
+          resetAllHighlights();
+          setStatusMessage("高亮功能已关闭，字母高亮已清除");
+          updateProgressText(0, wordLettersSpans.length);
+          // 如果音频正在播放，仅提示
+          if (audioPlayer && !audioPlayer.paused) {
+            setStatusMessage("高亮已关闭，音频继续播放");
+          }
+        } else {
+          // 开启高亮：如果音频正在播放，立即开始高亮动画（从头开始）
+          setStatusMessage("高亮功能已开启");
+          updateProgressText(currentHighlightStep, wordLettersSpans.length);
+          if (audioPlayer && !audioPlayer.paused) {
+            // 音频正在播放，重置并开始高亮（与音频同步从头开始更合理）
+            resetAndStartHighlight();
+          } else {
+            // 音频未播放，仅重置高亮显示但不自动开始动画
+            resetHighlightCompletely();
+          }
+        }
+      }
+
+      // ---------------------- 构建单词字母DOM ----------------------
+      function buildWordSpans(wordText) {
+        wordLetterContainer.innerHTML = "";
+        const lettersArray = wordText.split("");
+        const spanElements = [];
+
+        lettersArray.forEach((char, idx) => {
+          const span = document.createElement("span");
+          if (idx === 0) {
+            span.style = "display: none";
+          }
+          span.textContent = char;
+          span.className = "letter-span";
+          span.setAttribute("data-letter-index", idx);
+          wordLetterContainer.appendChild(span);
+          spanElements.push(span);
+        });
+
+        wordLettersSpans = spanElements;
+        return spanElements;
+      }
+
+      // 更新当前单词的显示并重置高亮状态
+      function updateWordAndResetHighlight() {
+        const currentWord = words[currentIndex][0];
+        console.log(words, currentIndex, currentWord);
+        buildWordSpans(currentWord);
+        stopHighlightAnimation(true);
+        resetAllHighlights();
+        currentHighlightStep = 0;
+        isHighlightingActive = false;
+        if (highlightEnabled) {
+          setStatusMessage(`当前单词: "${currentWord}"，播放音频将自动高亮`);
+        } else {
+          setStatusMessage(`当前单词: "${currentWord}"，高亮功能已关闭`);
+        }
+        updateProgressText(0, wordLettersSpans.length);
+      }
+
+      // ---------------------- 音频播放（本地文件）----------------------
+      function loadLocalAudio(filePath) {
+        if (audioPlayer) {
+          audioPlayer.pause();
+          audioPlayer.onplay = null;
+          audioPlayer.onpause = null;
+          audioPlayer.onended = null;
+          audioPlayer.onerror = null;
+          audioPlayer.src = "";
+        }
+        audioPlayer = new Audio(filePath);
+        currentAudioSrc = filePath;
+
+        // 绑定音频事件以实现联动
+        audioPlayer.onplay = () => {
+          onAudioPlay();
+        };
+        audioPlayer.onpause = () => {
+          onAudioPause();
+        };
+        audioPlayer.onended = () => {
+          setStatusMessage(`播放完成: "${words[currentIndex][0]}"`);
+          // 音频结束后，高亮动画自然停止（已完成或暂停）
+          if (highlightEnabled && isHighlightingActive) {
+            pauseHighlightAnimation();
+          }
+        };
+        audioPlayer.onerror = () => {
+          setStatusMessage(
+            `⚠️ 无法加载本地音频文件: ${filePath.split("/").pop()}`,
+            true
+          );
+        };
+        audioPlayer.load();
+      }
+
+      function updateAudioForCurrentWord() {
+        const audioSrc = words[currentIndex][1];
+        if (!audioPlayer || currentAudioSrc !== audioSrc) {
+          loadLocalAudio(audioSrc);
+        }
+      }
+
+      function playAudio() {
+        if (!audioPlayer) {
+          updateAudioForCurrentWord();
+          setTimeout(() => playAudio(), 100);
+          return;
+        }
+        audioPlayer.play().catch((err) => {
+          console.warn("播放错误:", err);
+          setStatusMessage(
+            `无法播放音频，请检查文件路径: ${words[currentIndex][1]}`,
+            true
+          );
+        });
       }
 
       function pauseAudio() {
         if (audioPlayer && !audioPlayer.paused) {
           audioPlayer.pause();
-          setStatusMessage(`⏸ Paused "${words[currentIndex][0]}"`);
-        } else if (audioPlayer && audioPlayer.paused) {
-          setStatusMessage(`⏸ Already paused (local audio)`);
-        } else {
-          setStatusMessage(`No active audio loaded`);
         }
       }
 
       function replayAudio() {
         if (!audioPlayer) {
-          setStatusMessage(`⏳ Loading audio first...`);
-          updateUIAndAudio();
-          setTimeout(() => replayAudio(), 100);
+          updateAudioForCurrentWord();
+          setTimeout(() => replayAudio(), 120);
           return;
         }
-
-        // Reset to beginning and play
+        // 重放时重置音频位置并触发重置逻辑
         audioPlayer.currentTime = 0;
-
-        const playPromise = audioPlayer.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              setStatusMessage(
-                `🔄 Replaying "${words[currentIndex][0]}" from local file`
-              );
-            })
-            .catch((err) => {
-              console.error("Replay failed on local file:", err);
-              setStatusMessage(
-                `⚠️ Replay error: file might be missing or invalid`,
-                true
-              );
-              // Attempt to reload audio completely
-              loadLocalAudio(words[currentIndex][1]);
-              setTimeout(() => {
-                if (audioPlayer) {
-                  audioPlayer.currentTime = 0;
-                  audioPlayer
-                    .play()
-                    .catch((e) =>
-                      setStatusMessage(`Retry failed: ${e.message}`, true)
-                    );
-                }
-              }, 120);
-            });
-        }
+        onAudioReset(); // 重置高亮动画
+        audioPlayer.play().catch((err) => {
+          setStatusMessage(`重放失败: ${err.message}`, true);
+        });
       }
 
-      // ---------- Dropdown population ----------
+      // ---------------------- 下拉菜单与导航 ----------------------
       function populateDropdown() {
         dropdown.innerHTML = "";
-        words.forEach((item) => {
+        words.forEach((item, idx) => {
           const option = document.createElement("option");
           option.value = item[0];
           option.textContent = item[0];
@@ -604,101 +836,68 @@
         dropdown.value = words[currentIndex][0];
       }
 
-      // ---------- Event Handlers ----------
-      function onDropdownChange(e) {
-        const selectedWord = e.target.value;
-        const foundIndex = words.findIndex((item) => item[0] === selectedWord);
-        if (foundIndex !== -1 && foundIndex !== currentIndex) {
-          setCurrentIndex(foundIndex);
+      function setCurrentIndex(newIndex) {
+        if (newIndex < 0 || newIndex >= words.length) return;
+        if (currentIndex === newIndex) return;
+        currentIndex = newIndex;
+
+        // 停止所有高亮动画
+        stopHighlightAnimation(true);
+        // 更新单词显示
+        updateWordAndResetHighlight();
+        // 同步下拉菜单
+        dropdown.value = words[currentIndex][0];
+        // 切换音频
+        updateAudioForCurrentWord();
+        // 切换单词时暂停音频播放
+        if (audioPlayer && !audioPlayer.paused) {
+          audioPlayer.pause();
         }
+        // 更新导航按钮状态
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === words.length - 1;
+        setStatusMessage(`已切换到单词: "${words[currentIndex][0]}"`);
       }
 
       function onPrev() {
-        if (currentIndex > 0) {
-          setCurrentIndex(currentIndex - 1);
-        } else {
-          setStatusMessage("Already at first word", false);
-        }
+        if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
       }
-
       function onNext() {
-        if (currentIndex < words.length - 1) {
-          setCurrentIndex(currentIndex + 1);
-        } else {
-          setStatusMessage("Already at last word", false);
-        }
+        if (currentIndex < words.length - 1) setCurrentIndex(currentIndex + 1);
+      }
+      function onDropdownChange(e) {
+        const selectedWord = e.target.value;
+        const idx = words.findIndex((w) => w[0] === selectedWord);
+        if (idx !== -1 && idx !== currentIndex) setCurrentIndex(idx);
       }
 
-      // ----- Helper: Show folder setup hint on console once -----
-      function showLocalFileHint() {
-        console.log("===== LOCAL AUDIO SETUP =====");
-        console.log(
-          "Update the 'words' array with your local audio file paths."
-        );
-        console.log("Example structure:");
-        words.forEach((w) => {
-          console.log(`  "${w[0]}" → ${w[1]}`);
-        });
-        console.log(
-          "If files are missing, you'll see an error in the status bar."
-        );
-        console.log(
-          "Create an 'audio' folder and place .mp3/.wav/.ogg files there."
-        );
-        console.log("============================");
-      }
-
-      // ----- Initialization -----
-      function initApp() {
+      // ---------------------- 初始化 ----------------------
+      function init() {
         populateDropdown();
-        // Start with first word
         currentIndex = 0;
-        updateUIAndAudio();
+        updateWordAndResetHighlight();
+        updateAudioForCurrentWord();
 
-        // Attach event listeners
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === words.length - 1;
+
         dropdown.addEventListener("change", onDropdownChange);
         prevBtn.addEventListener("click", onPrev);
         nextBtn.addEventListener("click", onNext);
         playBtn.addEventListener("click", playAudio);
         pauseBtn.addEventListener("click", pauseAudio);
         replayBtn.addEventListener("click", replayAudio);
+        toggleHighlightBtn.addEventListener("click", toggleHighlightFeature);
 
-        // Clean up on page unload
-        window.addEventListener("beforeunload", () => {
-          if (audioPlayer) {
-            audioPlayer.pause();
-            audioPlayer.src = "";
-          }
-        });
-
-        setStatusMessage(
-          `✅ Local audio player ready — ${words.length} words loaded`
-        );
-        showLocalFileHint();
-
-        // Extra: add example note if files likely missing (just informative)
-        setTimeout(() => {
-          // Check if first audio file might be missing (no automatic fetch, just friendly reminder)
-          setStatusMessage(
-            `💡 Tip: Place audio files at paths shown below each word`,
-            false
-          );
-        }, 1500);
+        updateToggleButtonUI();
+        setStatusMessage("准备就绪！点击播放，高亮将自动同步音频开始");
       }
 
-      // Start everything after DOM ready
       if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initApp);
+        document.addEventListener("DOMContentLoaded", init);
       } else {
-        initApp();
+        init();
       }
-
-      // Optional: expose for debugging (dev only)
-      window.localAudioHelper = {
-        reload: updateUIAndAudio,
-        getCurrentPath: () => words[currentIndex][1],
-        listWords: words,
-      };
     </script>
   </body>
 </html>
