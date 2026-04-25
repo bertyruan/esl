@@ -310,62 +310,78 @@
         justify-content: center;
         margin-top: 0.8rem;
       }
+
+      .instructions {
+        margin: 1rem 0 1rem 1rem;
+      }
     </style>
   </head>
   <body>
-    <div class="card">
-      <div class="container">
-        <!-- 区域1：下拉菜单 -->
-        <div class="selector-section">
-          <span class="selector-label">📖 选择单词</span>
-          <select
-            id="wordDropdown"
-            class="custom-select"
-            aria-label="单词列表"
-          ></select>
-        </div>
-
-        <!-- 区域2：上一个/下一个按钮 -->
-        <div class="nav-section">
-          <button id="prevBtn" class="nav-btn">◀ 上一个</button>
-          <button id="nextBtn" class="nav-btn">下一个 ▶</button>
-        </div>
-
-        <!-- 区域3：主界面 - 单词显示 + 音频联动高亮 -->
-        <div class="word-display">
-          <div id="wordLetterContainer" class="word-letter-container"></div>
-
-          <div class="audio-controls">
-            <button id="playAudioBtn" class="audio-btn play-btn">▶ 播放</button>
-            <button id="pauseAudioBtn" class="audio-btn pause-btn">
-              ⏸ 暂停
-            </button>
-            <button id="replayAudioBtn" class="audio-btn replay-btn">
-              ⟳ 重放
-            </button>
+    <div class="card container">
+      <div class="card container" style="margin-bottom: 1rem">
+        <h2>提示</h2>
+        <ol class="instructions">
+          <li>先一个一个地念出每个字母的发音，然后再把整个单词连起来读出来</li>
+          <li>听播放</li>
+          <li>再次读一遍</li>
+        </ol>
+      </div>
+      <div class="card">
+        <div class="container">
+          <!-- 区域1：下拉菜单 -->
+          <div class="selector-section">
+            <span class="selector-label">📖 选择单词</span>
+            <select
+              id="wordDropdown"
+              class="custom-select"
+              aria-label="单词列表"
+            ></select>
           </div>
 
-          <div class="highlight-controls">
-            <button
-              id="toggleHighlightBtn"
-              class="audio-btn toggle-highlight-btn"
-            >
-              <span id="toggleIcon">✨</span>
-              <span id="toggleText">高亮已开启</span>
-            </button>
+          <!-- 区域2：上一个/下一个按钮 -->
+          <div class="nav-section">
+            <button id="prevBtn" class="nav-btn">◀ 上一个</button>
+            <button id="nextBtn" class="nav-btn">下一个 ▶</button>
           </div>
 
-          <div id="highlightStatus" class="status-area">
-            <span id="statusMessage"
-              >🎵 点击播放按钮，高亮将随音频自动开始</span
-            >
-            <div id="progressIndicator" class="progress-info"></div>
+          <!-- 区域3：主界面 - 单词显示 + 音频联动高亮 -->
+          <div class="word-display">
+            <div id="wordLetterContainer" class="word-letter-container"></div>
+
+            <div class="audio-controls">
+              <button id="playAudioBtn" class="audio-btn play-btn">
+                ▶ 播放
+              </button>
+              <button id="pauseAudioBtn" class="audio-btn pause-btn">
+                ⏸ 暂停
+              </button>
+              <button id="replayAudioBtn" class="audio-btn replay-btn">
+                ⟳ 重放
+              </button>
+            </div>
+
+            <div class="highlight-controls">
+              <button
+                id="toggleHighlightBtn"
+                class="audio-btn toggle-highlight-btn"
+              >
+                <span id="toggleIcon">✨</span>
+                <span id="toggleText">高亮已开启</span>
+              </button>
+            </div>
+
+            <div id="highlightStatus" class="status-area">
+              <span id="statusMessage"
+                >🎵 点击播放按钮，高亮将随音频自动开始</span
+              >
+              <div id="progressIndicator" class="progress-info"></div>
+            </div>
           </div>
+          <footer>
+            高亮与音频联动 • 播放时自动逐字母高亮 • 暂停时动画暂停 •
+            重放时重置高亮
+          </footer>
         </div>
-        <footer>
-          高亮与音频联动 • 播放时自动逐字母高亮 • 暂停时动画暂停 •
-          重放时重置高亮
-        </footer>
       </div>
     </div>
 
