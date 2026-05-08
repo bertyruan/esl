@@ -52,6 +52,16 @@
         background: var(--primary);
         color: white;
       }
+
+      .lazy-img {
+        opacity: 0;
+        transition: opacity 0.5s ease-in;
+      }
+
+      /* When the image finishes downloading, we make it visible */
+      .lazy-img[src] {
+        opacity: 1;
+      }
     </style>
   </head>
   <body>
@@ -96,7 +106,8 @@
         const div = document.createElement("div");
         div.className = "card";
         div.innerHTML = `
-                <img src="${card.image}" alt="${card.title}">
+                <img src="${card.image}" alt="${card.title}" loading="lazy" 
+                class="lazy-img">
                 <h2>${card.title}</h2>
             `;
         div.onclick = () => {

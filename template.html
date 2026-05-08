@@ -53,6 +53,9 @@
         border-radius: 20px;
         margin-bottom: 20px;
         border: 5px solid #f0f0f0;
+        background: #f0f0f0
+          url('data:image/svg+xml;charset=utf8,<svg xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" transition=".5s" font-family="sans-serif" font-size="14" fill="%23999" text-anchor="middle">加载中...</text></svg>')
+          no-repeat center;
       }
 
       /* Highlighting Styles */
@@ -188,6 +191,17 @@
         const audioSrc = data[1];
         const imgSrc = data[2];
 
+        // Reset opacity before changing source to trigger a new fade
+        displayImg.style.opacity = "0";
+
+        displayImg.src = imgSrc || "";
+
+        // When the new image is ready, fade it in
+        displayImg.onload = () => {
+          displayImg.style.opacity = "1";
+        };
+
+        displayImg.style.display = imgSrc ? "inline-block" : "none";
         // Update UI
         displayImg.src = imgSrc || "";
         displayImg.style.display = imgSrc ? "inline-block" : "none";
