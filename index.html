@@ -1,919 +1,111 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
-    <title>单词高亮播放器 | 音频联动逐字母动画</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>我的英语乐园</title>
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
+      :root {
+        --primary: #ffb74d;
+        --secondary: #4fc3f7;
+        --text: #5d4037;
       }
-
       body {
-        background: linear-gradient(145deg, #f5f7fc 0%, #eef2f6 100%);
-        font-family: system-ui, -apple-system, "Segoe UI", "Roboto",
-          "Helvetica Neue", sans-serif;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        background: #fff9c4;
+        color: var(--text);
+        margin: 0;
         padding: 20px;
       }
-
+      h1 {
+        text-align: center;
+        color: #f57c00;
+        font-size: 2.5rem;
+      }
+      .card-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+      }
       .card {
-        max-width: 720px;
-        width: 100%;
-        background: rgba(255, 255, 255, 0.96);
-        border-radius: 56px;
-        box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25),
-          0 2px 8px rgba(0, 0, 0, 0.05);
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.5);
-      }
-
-      .container {
-        padding: 2rem 1.8rem 2.2rem;
-      }
-
-      /* 下拉菜单区域 */
-      .selector-section {
-        margin-bottom: 2rem;
-      }
-
-      .selector-label {
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        font-weight: 600;
-        color: #4a5b6e;
-        margin-bottom: 0.6rem;
-        display: block;
-      }
-
-      .custom-select {
-        width: 100%;
-        padding: 0.9rem 1.2rem;
-        font-size: 1rem;
-        font-weight: 500;
-        background-color: #ffffff;
-        border: 2px solid #e2e8f0;
-        border-radius: 44px;
-        appearance: none;
-        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%233b4b5e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
-        background-repeat: no-repeat;
-        background-position: right 1.2rem center;
-        background-size: 1.2rem;
-        cursor: pointer;
-        transition: all 0.2s;
-        color: #1e293b;
-      }
-
-      .custom-select:focus {
-        outline: none;
-        border-color: #8b5cf6;
-        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-      }
-
-      /* 上一页/下一页按钮 */
-      .nav-section {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 2rem;
-      }
-
-      .nav-btn {
-        flex: 1;
-        background: #ffffff;
-        border: 1.5px solid #e2e8f0;
-        border-radius: 60px;
-        padding: 0.8rem 0;
-        font-weight: 600;
-        font-size: 1rem;
-        color: #2c3e4e;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        background-color: #fefefe;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-      }
-
-      .nav-btn:hover:not(:disabled) {
-        background-color: #f1f5f9;
-        border-color: #cbd5e1;
-        transform: scale(0.98);
-      }
-
-      .nav-btn:active:not(:disabled) {
-        background-color: #e6edf4;
-        transform: scale(0.96);
-      }
-
-      .nav-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-
-      /* 主显示区域 - 字母高亮 */
-      .word-display {
-        background: linear-gradient(135deg, #fafcff 0%, #ffffff 100%);
-        border-radius: 48px;
-        padding: 2rem 1.5rem;
-        margin-bottom: 1.8rem;
-        text-align: center;
-        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02),
-          0 12px 20px -12px rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(148, 163, 184, 0.15);
-      }
-
-      /* 单词字母容器 */
-      .word-letter-container {
-        font-size: clamp(2.4rem, 10vw, 4.5rem);
-        font-weight: 800;
-        letter-spacing: 0.02em;
-        margin-bottom: 1.5rem;
-        word-break: break-word;
-        line-height: 1.3;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.05em;
-      }
-
-      .letter-span {
-        display: inline-block;
-        transition: all 0.2s ease;
-        padding: 0 0.02em;
-        border-radius: 12px;
-        color: #1e293b;
-      }
-
-      /* 高亮样式 */
-      .letter-highlight {
-        background: linear-gradient(135deg, #fbbf24, #f59e0b);
-        color: #0f172a;
-        text-shadow: 0 1px 2px rgba(255, 255, 200, 0.5);
-        transform: scale(1.05);
-        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
-      }
-
-      .word-highlight-all {
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: white;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        border-radius: 20px;
-        padding: 0 0.15em;
-        transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-      }
-
-      /* 音频控制按钮 */
-      .audio-controls {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        flex-wrap: wrap;
-        margin: 0.5rem 0 1rem;
-      }
-
-      .audio-btn {
         background: white;
-        border: none;
-        padding: 0.7rem 1.4rem;
-        border-radius: 60px;
-        font-size: 0.95rem;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
+        border-radius: 20px;
+        border: 4px solid var(--primary);
+        overflow: hidden;
         cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e9eef3;
-        color: #1e293b;
-      }
-
-      .audio-btn:active {
-        transform: scale(0.95);
-      }
-
-      .play-btn {
-        background: #8b5cf6;
-        border-color: #7c3aed;
-        color: white;
-      }
-
-      .play-btn:hover {
-        background: #7c3aed;
-        transform: translateY(-2px);
-      }
-
-      .pause-btn,
-      .replay-btn {
-        background: #f8fafc;
-      }
-
-      .pause-btn:hover,
-      .replay-btn:hover {
-        background: #f1f5f9;
-      }
-
-      /* 高亮开关按钮 - 替换原来的两个按钮 */
-      .toggle-highlight-btn {
-        background: linear-gradient(135deg, #10b981, #059669);
-        border-color: #047857;
-        color: white;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        min-width: 160px;
-      }
-
-      .toggle-highlight-btn.off {
-        background: linear-gradient(135deg, #6b7280, #4b5563);
-        border-color: #374151;
-        box-shadow: none;
-      }
-
-      .toggle-highlight-btn:hover {
-        transform: translateY(-2px);
-        filter: brightness(1.05);
-      }
-
-      .status-area {
-        font-size: 0.75rem;
-        color: #6c7a8e;
-        margin-top: 1rem;
+        transition: transform 0.2s;
         text-align: center;
       }
-
-      .progress-info {
-        font-size: 0.7rem;
-        background: #f1f5f9;
-        display: inline-block;
-        padding: 0.2rem 0.8rem;
-        border-radius: 30px;
-        margin-top: 0.5rem;
+      .card:hover {
+        transform: scale(1.05);
       }
-
-      .highlight-indicator {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        border-radius: 10px;
-        background-color: #10b981;
-        margin-right: 6px;
-        box-shadow: 0 0 4px #10b981;
+      .card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
       }
-
-      .highlight-indicator.off {
-        background-color: #9ca3af;
-        box-shadow: none;
-      }
-
-      @media (max-width: 550px) {
-        .container {
-          padding: 1.5rem 1.2rem;
-        }
-        .audio-btn {
-          padding: 0.55rem 1rem;
-          font-size: 0.85rem;
-        }
-        .word-letter-container {
-          font-size: clamp(1.8rem, 8vw, 3rem);
-        }
-        .toggle-highlight-btn {
-          min-width: 140px;
-        }
-      }
-
-      button:focus-visible,
-      select:focus-visible {
-        outline: 2px solid #8b5cf6;
-        outline-offset: 2px;
-      }
-
-      footer {
-        text-align: center;
-        font-size: 0.7rem;
-        color: #94a3b8;
-        margin-top: 1rem;
-      }
-
-      .highlight-controls {
-        display: flex;
-        justify-content: center;
-        margin-top: 0.8rem;
-      }
-
-      .instructions {
-        margin: 1rem 0 1rem 1rem;
+      .card h2 {
+        padding: 10px;
+        margin: 0;
+        background: var(--primary);
+        color: white;
       }
     </style>
   </head>
   <body>
-    <div class="card container">
-      <div class="card container" style="margin-bottom: 1rem">
-        <h2>提示</h2>
-        <ol class="instructions">
-          <li>先一个一个地念出每个字母的发音，然后再把整个单词连起来读出来</li>
-          <li>听播放</li>
-          <li>再次读一遍</li>
-        </ol>
-      </div>
-      <div class="card">
-        <div class="container">
-          <!-- 区域1：下拉菜单 -->
-          <div class="selector-section">
-            <span class="selector-label">📖 选择单词</span>
-            <select
-              id="wordDropdown"
-              class="custom-select"
-              aria-label="单词列表"
-            ></select>
-          </div>
-
-          <!-- 区域2：上一个/下一个按钮 -->
-          <div class="nav-section">
-            <button id="prevBtn" class="nav-btn">◀ 上一个</button>
-            <button id="nextBtn" class="nav-btn">下一个 ▶</button>
-          </div>
-
-          <!-- 区域3：主界面 - 单词显示 + 音频联动高亮 -->
-          <div class="word-display">
-            <div id="wordLetterContainer" class="word-letter-container"></div>
-
-            <div class="audio-controls">
-              <button id="playAudioBtn" class="audio-btn play-btn">
-                ▶ 播放
-              </button>
-              <button id="pauseAudioBtn" class="audio-btn pause-btn">
-                ⏸ 暂停
-              </button>
-              <button id="replayAudioBtn" class="audio-btn replay-btn">
-                ⟳ 重放
-              </button>
-            </div>
-
-            <div class="highlight-controls" style="display: none">
-              <button
-                id="toggleHighlightBtn"
-                class="audio-btn toggle-highlight-btn"
-              >
-                <span id="toggleIcon">✨</span>
-                <span id="toggleText">高亮已开启</span>
-              </button>
-            </div>
-
-            <div id="highlightStatus" class="status-area">
-              <span id="statusMessage"
-                >🎵 点击播放按钮，高亮将随音频自动开始</span
-              >
-              <div id="progressIndicator" class="progress-info"></div>
-            </div>
-          </div>
-          <footer>
-            高亮与音频联动 • 播放时自动逐字母高亮 • 暂停时动画暂停 •
-            重放时重置高亮
-          </footer>
-        </div>
-      </div>
-    </div>
+    <h1>🌟 英语学习乐园 🌟</h1>
+    <div class="card-container" id="cardGrid"></div>
 
     <script>
-      // ================================================================
-      // 数据：单词列表，格式为 [单词, 本地音频文件路径]
-      // 注意：以下 'words' 变量中的英文单词保持不变，仅界面文字为中文
-      // ================================================================
-      const words = [
-        [" bat", "audio/bat.m4a"],
-        [" pit", "audio/pit.m4a"],
-        [" hat", "audio/hat.m4a"],
-        [" dot", "audio/dot.m4a"],
-        [" but", "audio/but.m4a"],
-        [" bit", "audio/bit.m4a"],
-        [" bot", "audio/bot.m4a"],
-        [" cut", "audio/cut.m4a"],
+      // Data structure provided
+      const plurals = "wig, rag, bag, cup, hat, pot, bed, kid"
+        .split(", ")
+        .map((x) => {
+          let a = x.split("");
+          a[a.length - 1] = `${a[a.length - 1]}s`;
+          return [a, `./audio/${x}.m4a`, `./images/${x}.png`];
+        });
+      const ePractice = "bed, pen, pet, wet, hen, red, ten"
+        .split(", ")
+        .map((x) => [x.split(""), `./audio/${x}.m4a`, `./images/${x}.png`]);
+      const pluralsCard = {
+        image: "images/pot.png",
+        link: "template.html",
+        title: "复数 练习",
+        phrases: plurals,
+      };
+      const eCard = {
+        image: "images/bed.png",
+        link: "template.html",
+        title: "短 e 音练习",
+        phrases: ePractice,
+      };
+
+      const cards = [pluralsCard, eCard];
+
+      const questions = [
+        ["audio/pet.m4a", ["Dog", "Pet", "Cat"], 1], // Answer is index 1 (Pet)
+        ["audio/morning.m4a", ["Morning", "Night", "Afternoon"], 0],
       ];
+      localStorage.setItem("testData", JSON.stringify(questions));
 
-      // ---------------------- 全局状态 --------------------------
-      let currentIndex = 0; // 当前选中的单词索引
-      let audioPlayer = null; // 音频播放器实例
-      let currentAudioSrc = null; // 当前音频源路径
-
-      // 高亮动画状态
-      let highlightTimer = null; // 定时器ID
-      let currentHighlightStep = 0; // 当前高亮到的字母索引
-      let isHighlightingActive = false; // 是否正在执行高亮动画（动画进行中）
-      let highlightEnabled = true; // 高亮功能总开关（用户通过toggle按钮控制）
-      let animationPausedByAudio = false; // 是否因音频暂停而暂停动画
-
-      let wordLettersSpans = []; // 每个字母的DOM元素数组
-
-      // DOM 元素
-      const dropdown = document.getElementById("wordDropdown");
-      const prevBtn = document.getElementById("prevBtn");
-      const nextBtn = document.getElementById("nextBtn");
-      const wordLetterContainer = document.getElementById(
-        "wordLetterContainer"
-      );
-      const playBtn = document.getElementById("playAudioBtn");
-      const pauseBtn = document.getElementById("pauseAudioBtn");
-      const replayBtn = document.getElementById("replayAudioBtn");
-      const toggleHighlightBtn = document.getElementById("toggleHighlightBtn");
-      const toggleIcon = document.getElementById("toggleIcon");
-      const toggleText = document.getElementById("toggleText");
-      const statusMessageSpan = document.getElementById("statusMessage");
-      const progressIndicator = document.getElementById("progressIndicator");
-
-      // 辅助函数：更新状态栏消息
-      function setStatusMessage(msg, isError = false) {
-        statusMessageSpan.textContent = msg;
-        statusMessageSpan.style.color = isError ? "#e11d48" : "#4b5563";
-        if (!isError) {
-          setTimeout(() => {
-            if (statusMessageSpan.textContent === msg) {
-              statusMessageSpan.style.color = "#6c7a8e";
-            }
-          }, 2500);
-        }
-      }
-
-      // 辅助函数：更新进度显示
-      function updateProgressText(currentLetter, totalLetters) {
-        if (totalLetters === 0) {
-          progressIndicator.textContent = "";
-          return;
-        }
-        if (!highlightEnabled) {
-          progressIndicator.textContent = "🔘 高亮功能已关闭";
-          return;
-        }
-        if (currentLetter < totalLetters && currentLetter >= 0) {
-          progressIndicator.textContent = `📝 高亮进度: ${
-            currentLetter + 1
-          }/${totalLetters}`;
-        } else if (currentLetter === totalLetters && totalLetters > 0) {
-          progressIndicator.textContent = `✨ 单词高亮完成！ ✨`;
-        } else {
-          progressIndicator.textContent = "";
-        }
-      }
-
-      // 更新toggle按钮的UI
-      function updateToggleButtonUI() {
-        if (highlightEnabled) {
-          toggleIcon.textContent = "✨";
-          toggleText.textContent = "高亮已开启";
-          toggleHighlightBtn.classList.remove("off");
-          toggleHighlightBtn.style.background =
-            "linear-gradient(135deg, #10b981, #059669)";
-        } else {
-          toggleIcon.textContent = "🚫";
-          toggleText.textContent = "高亮已关闭";
-          toggleHighlightBtn.classList.add("off");
-          toggleHighlightBtn.style.background =
-            "linear-gradient(135deg, #6b7280, #4b5563)";
-        }
-      }
-
-      // ---------------------- 核心高亮功能 ----------------------
-      // 清除所有高亮样式
-      function resetAllHighlights() {
-        if (!wordLettersSpans.length) return;
-        wordLettersSpans.forEach((span) => {
-          span.classList.remove("letter-highlight");
-          span.classList.remove("word-highlight-all");
-        });
-      }
-
-      // 停止动画（清除定时器，重置内部标志）
-      function stopHighlightAnimation(resetStep = true) {
-        if (highlightTimer) {
-          clearTimeout(highlightTimer);
-          highlightTimer = null;
-        }
-        isHighlightingActive = false;
-        if (resetStep) {
-          currentHighlightStep = 0;
-        }
-        animationPausedByAudio = false;
-      }
-
-      // 完全重置高亮（停止动画 + 清除所有高亮样式）
-      function resetHighlightCompletely() {
-        stopHighlightAnimation(true);
-        resetAllHighlights();
-        if (highlightEnabled) {
-          setStatusMessage("高亮已重置");
-        }
-        updateProgressText(0, wordLettersSpans.length);
-      }
-
-      // 核心动画：逐字母高亮（从当前step开始，继续执行）
-      // 如果 alreadyStarted=true 表示是恢复动画，不要重置已有高亮
-      function startOrResumeHighlightAnimation(resetFromBeginning = false) {
-        // 如果高亮功能被关闭，不执行任何动画
-        if (!highlightEnabled) {
-          return;
-        }
-
-        // 如果要求从头开始，重置step和高亮样式
-        if (resetFromBeginning) {
-          stopHighlightAnimation(true);
-          resetAllHighlights();
-          currentHighlightStep = 0;
-        }
-
-        const letters = wordLettersSpans;
-        const totalLetters = letters.length + 1;
-        console.log(totalLetters);
-        if (totalLetters === 0) {
-          return;
-        }
-
-        // 如果已经完成了全部高亮（step >= totalLetters），不再重复开始
-        if (currentHighlightStep >= totalLetters) {
-          // 确保整个单词高亮样式存在
-          if (highlightEnabled) {
-            letters.forEach((span) => {
-              span.classList.remove("letter-highlight");
-              span.classList.add("word-highlight-all");
-            });
-            updateProgressText(totalLetters, totalLetters);
-          }
-          return;
-        }
-
-        // 如果已经有动画在运行，先停止再重新开始（避免重叠）
-        if (isHighlightingActive) {
-          stopHighlightAnimation(false); // 保留currentHighlightStep
-        }
-
-        isHighlightingActive = true;
-
-        // 定义递归高亮函数
-        function highlightNextLetter(stepIndex) {
-          // 动画被外部停止或高亮功能关闭时，退出
-          if (!isHighlightingActive || !highlightEnabled) {
-            return;
-          }
-
-          const lettersNow = wordLettersSpans;
-          const totalNow = lettersNow.length;
-
-          // 防止单词变化导致的索引越界
-          if (stepIndex >= totalNow) {
-            // 所有字母完成，高亮整个单词
-            lettersNow.forEach((span) => {
-              span.classList.remove("letter-highlight");
-              span.classList.add("word-highlight-all");
-            });
-            setStatusMessage(`🎉 单词 "${words[currentIndex][0]}" 高亮完成！`);
-            updateProgressText(totalNow, totalNow);
-            isHighlightingActive = false;
-            currentHighlightStep = totalNow;
-            highlightTimer = null;
-            return;
-          }
-
-          // 移除所有字母高亮和整词高亮（但保留之前完成状态）
-          lettersNow.forEach((span) => {
-            span.classList.remove("letter-highlight");
-            span.classList.remove("word-highlight-all");
-          });
-
-          // 高亮当前字母
-          lettersNow[stepIndex].classList.add("letter-highlight");
-          currentHighlightStep = stepIndex;
-          updateProgressText(stepIndex, totalNow);
-
-          // 调度下一个字母（1秒后）
-          highlightTimer = setTimeout(() => {
-            highlightNextLetter(stepIndex + 1);
-          }, 1000);
-        }
-
-        // 从 currentHighlightStep 开始
-        const startStep = currentHighlightStep;
-        // 先清除之前的定时器
-        if (highlightTimer) {
-          clearTimeout(highlightTimer);
-          highlightTimer = null;
-        }
-        highlightTimer = setTimeout(() => {
-          if (highlightEnabled && isHighlightingActive) {
-            highlightNextLetter(startStep);
-          }
-        }, 50);
-      }
-
-      // 暂停高亮动画（保留当前进度）
-      function pauseHighlightAnimation() {
-        if (isHighlightingActive) {
-          stopHighlightAnimation(false); // 保留 currentHighlightStep
-          animationPausedByAudio = true;
-          setStatusMessage(
-            `高亮动画已暂停，当前进度: 第 ${currentHighlightStep}/${wordLettersSpans.length} 个字母`
-          );
-        }
-      }
-
-      // 恢复高亮动画（从上次暂停处继续）
-      function resumeHighlightAnimation() {
-        if (!highlightEnabled) {
-          return;
-        }
-        if (
-          currentHighlightStep < wordLettersSpans.length &&
-          !isHighlightingActive
-        ) {
-          animationPausedByAudio = false;
-          startOrResumeHighlightAnimation(false); // 从当前step继续
-          setStatusMessage(
-            `恢复高亮动画，继续第 ${currentHighlightStep + 1}/${
-              wordLettersSpans.length
-            } 个字母`
-          );
-        } else if (currentHighlightStep >= wordLettersSpans.length) {
-          // 已经完成，不需要恢复
-          setStatusMessage(`单词高亮已完成`);
-        }
-      }
-
-      // 重置高亮并从头开始（用于重放或切换单词）
-      function resetAndStartHighlight() {
-        if (!highlightEnabled) {
-          resetHighlightCompletely();
-          return;
-        }
-        stopHighlightAnimation(true);
-        resetAllHighlights();
-        currentHighlightStep = 0;
-        startOrResumeHighlightAnimation(true);
-      }
-
-      // ---------------------- 音频联动逻辑 ----------------------
-      // 当音频开始播放时调用
-      function onAudioPlay() {
-        if (highlightEnabled) {
-          // 如果动画已完成（step >= 总长度），重置再开始
-          if (currentHighlightStep >= wordLettersSpans.length) {
-            resetAndStartHighlight();
-          } else if (!isHighlightingActive) {
-            // 动画未激活，恢复
-            resumeHighlightAnimation();
-          }
-          setStatusMessage(`▶ 播放中，高亮同步进行`);
-        } else {
-          setStatusMessage(`▶ 播放中（高亮功能已关闭）`);
-        }
-      }
-
-      // 当音频暂停时调用
-      function onAudioPause() {
-        if (highlightEnabled && isHighlightingActive) {
-          pauseHighlightAnimation();
-          setStatusMessage(`⏸ 音频暂停，高亮动画已暂停`);
-        }
-      }
-
-      // 当音频重放/重置时调用（重置到开头）
-      function onAudioReset() {
-        if (highlightEnabled) {
-          resetAndStartHighlight();
-          setStatusMessage(`⟳ 重放开始，高亮已重置并重新开始`);
-        } else {
-          resetHighlightCompletely();
-          setStatusMessage(`⟳ 重放开始（高亮功能已关闭）`);
-        }
-      }
-
-      // ---------------------- 切换高亮开关 ----------------------
-      function toggleHighlightFeature() {
-        highlightEnabled = !highlightEnabled;
-        updateToggleButtonUI();
-
-        if (!highlightEnabled) {
-          // 关闭高亮：停止动画，清除所有高亮样式
-          stopHighlightAnimation(true);
-          resetAllHighlights();
-          setStatusMessage("高亮功能已关闭，字母高亮已清除");
-          updateProgressText(0, wordLettersSpans.length);
-          // 如果音频正在播放，仅提示
-          if (audioPlayer && !audioPlayer.paused) {
-            setStatusMessage("高亮已关闭，音频继续播放");
-          }
-        } else {
-          // 开启高亮：如果音频正在播放，立即开始高亮动画（从头开始）
-          setStatusMessage("高亮功能已开启");
-          updateProgressText(currentHighlightStep, wordLettersSpans.length);
-          if (audioPlayer && !audioPlayer.paused) {
-            // 音频正在播放，重置并开始高亮（与音频同步从头开始更合理）
-            resetAndStartHighlight();
-          } else {
-            // 音频未播放，仅重置高亮显示但不自动开始动画
-            resetHighlightCompletely();
-          }
-        }
-      }
-
-      // ---------------------- 构建单词字母DOM ----------------------
-      function buildWordSpans(wordText) {
-        wordLetterContainer.innerHTML = "";
-        const lettersArray = wordText.split("");
-        const spanElements = [];
-
-        lettersArray.forEach((char, idx) => {
-          const span = document.createElement("span");
-          if (idx === 0) {
-            span.style = "display: none";
-          }
-          span.textContent = char;
-          span.className = "letter-span";
-          span.setAttribute("data-letter-index", idx);
-          wordLetterContainer.appendChild(span);
-          spanElements.push(span);
-        });
-
-        wordLettersSpans = spanElements;
-        return spanElements;
-      }
-
-      // 更新当前单词的显示并重置高亮状态
-      function updateWordAndResetHighlight() {
-        const currentWord = words[currentIndex][0];
-        console.log(words, currentIndex, currentWord);
-        buildWordSpans(currentWord);
-        stopHighlightAnimation(true);
-        resetAllHighlights();
-        currentHighlightStep = 0;
-        isHighlightingActive = false;
-        if (highlightEnabled) {
-          setStatusMessage(`当前单词: "${currentWord}"，播放音频将自动高亮`);
-        } else {
-          setStatusMessage(`当前单词: "${currentWord}"，高亮功能已关闭`);
-        }
-        updateProgressText(0, wordLettersSpans.length);
-      }
-
-      // ---------------------- 音频播放（本地文件）----------------------
-      function loadLocalAudio(filePath) {
-        if (audioPlayer) {
-          audioPlayer.pause();
-          audioPlayer.onplay = null;
-          audioPlayer.onpause = null;
-          audioPlayer.onended = null;
-          audioPlayer.onerror = null;
-          audioPlayer.src = "";
-        }
-        audioPlayer = new Audio(filePath);
-        currentAudioSrc = filePath;
-
-        // 绑定音频事件以实现联动
-        audioPlayer.onplay = () => {
-          onAudioPlay();
+      const grid = document.getElementById("cardGrid");
+      cards.forEach((card) => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+                <img src="${card.image}" alt="${card.title}">
+                <h2>${card.title}</h2>
+            `;
+        div.onclick = () => {
+          // Save specific lesson data to local storage for the template page
+          localStorage.setItem("currentLesson", JSON.stringify(card.phrases));
+          window.location.href = card.link;
         };
-        audioPlayer.onpause = () => {
-          onAudioPause();
-        };
-        audioPlayer.onended = () => {
-          setStatusMessage(`播放完成: "${words[currentIndex][0]}"`);
-          // 音频结束后，高亮动画自然停止（已完成或暂停）
-          if (highlightEnabled && isHighlightingActive) {
-            pauseHighlightAnimation();
-          }
-        };
-        audioPlayer.onerror = () => {
-          setStatusMessage(
-            `⚠️ 无法加载本地音频文件: ${filePath.split("/").pop()}`,
-            true
-          );
-        };
-        audioPlayer.load();
-      }
-
-      function updateAudioForCurrentWord() {
-        const audioSrc = words[currentIndex][1];
-        if (!audioPlayer || currentAudioSrc !== audioSrc) {
-          loadLocalAudio(audioSrc);
-        }
-      }
-
-      function playAudio() {
-        if (!audioPlayer) {
-          updateAudioForCurrentWord();
-          setTimeout(() => playAudio(), 100);
-          return;
-        }
-        audioPlayer.play().catch((err) => {
-          console.warn("播放错误:", err);
-          setStatusMessage(
-            `无法播放音频，请检查文件路径: ${words[currentIndex][1]}`,
-            true
-          );
-        });
-      }
-
-      function pauseAudio() {
-        if (audioPlayer && !audioPlayer.paused) {
-          audioPlayer.pause();
-        }
-      }
-
-      function replayAudio() {
-        if (!audioPlayer) {
-          updateAudioForCurrentWord();
-          setTimeout(() => replayAudio(), 120);
-          return;
-        }
-        // 重放时重置音频位置并触发重置逻辑
-        audioPlayer.currentTime = 0;
-        onAudioReset(); // 重置高亮动画
-        audioPlayer.play().catch((err) => {
-          setStatusMessage(`重放失败: ${err.message}`, true);
-        });
-      }
-
-      // ---------------------- 下拉菜单与导航 ----------------------
-      function populateDropdown() {
-        dropdown.innerHTML = "";
-        words.forEach((item, idx) => {
-          const option = document.createElement("option");
-          option.value = item[0];
-          option.textContent = item[0];
-          dropdown.appendChild(option);
-        });
-        dropdown.value = words[currentIndex][0];
-      }
-
-      function setCurrentIndex(newIndex) {
-        if (newIndex < 0 || newIndex >= words.length) return;
-        if (currentIndex === newIndex) return;
-        currentIndex = newIndex;
-
-        // 停止所有高亮动画
-        stopHighlightAnimation(true);
-        // 更新单词显示
-        updateWordAndResetHighlight();
-        // 同步下拉菜单
-        dropdown.value = words[currentIndex][0];
-        // 切换音频
-        updateAudioForCurrentWord();
-        // 切换单词时暂停音频播放
-        if (audioPlayer && !audioPlayer.paused) {
-          audioPlayer.pause();
-        }
-        // 更新导航按钮状态
-        prevBtn.disabled = currentIndex === 0;
-        nextBtn.disabled = currentIndex === words.length - 1;
-        setStatusMessage(`已切换到单词: "${words[currentIndex][0]}"`);
-      }
-
-      function onPrev() {
-        if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
-      }
-      function onNext() {
-        if (currentIndex < words.length - 1) setCurrentIndex(currentIndex + 1);
-      }
-      function onDropdownChange(e) {
-        const selectedWord = e.target.value;
-        const idx = words.findIndex((w) => w[0] === selectedWord);
-        if (idx !== -1 && idx !== currentIndex) setCurrentIndex(idx);
-      }
-
-      // ---------------------- 初始化 ----------------------
-      function init() {
-        populateDropdown();
-        currentIndex = 0;
-        updateWordAndResetHighlight();
-        updateAudioForCurrentWord();
-
-        prevBtn.disabled = currentIndex === 0;
-        nextBtn.disabled = currentIndex === words.length - 1;
-
-        dropdown.addEventListener("change", onDropdownChange);
-        prevBtn.addEventListener("click", onPrev);
-        nextBtn.addEventListener("click", onNext);
-        playBtn.addEventListener("click", playAudio);
-        pauseBtn.addEventListener("click", pauseAudio);
-        replayBtn.addEventListener("click", replayAudio);
-        toggleHighlightBtn.addEventListener("click", toggleHighlightFeature);
-
-        updateToggleButtonUI();
-        setStatusMessage("准备就绪！点击播放，高亮将自动同步音频开始");
-      }
-
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", init);
-      } else {
-        init();
-      }
+        grid.appendChild(div);
+      });
     </script>
   </body>
 </html>

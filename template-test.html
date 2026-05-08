@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>英语小测试</title>
+    <style>
+      :root {
+        --soft-purple: #e1bee7;
+        --gold: #ffd700;
+      }
+      body {
+        font-family: sans-serif;
+        background: #f3e5f5;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .nav-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        width: 100%;
+        max-width: 600px;
+      }
+      select {
+        flex-grow: 1;
+        padding: 10px;
+        border-radius: 10px;
+        border: 2px solid #9c27b0;
+      }
+
+      .main-display {
+        background: white;
+        padding: 30px;
+        border-radius: 30px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 95%;
+        max-width: 600px;
+      }
+
+      .choices-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin: 25px 0;
+      }
+      .choice-btn {
+        padding: 20px;
+        font-size: 1.5rem;
+        border: 3px solid #e0e0e0;
+        border-radius: 15px;
+        background: white;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .choice-btn:hover {
+        background: #f5f5f5;
+        border-color: #9c27b0;
+      }
+      .choice-btn.correct {
+        background: #c8e6c9;
+        border-color: #4caf50;
+      }
+      .choice-btn.incorrect {
+        background: #ffcdd2;
+        border-color: #f44336;
+      }
+
+      .feedback {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 15px 0;
+        min-height: 1.6em;
+      }
+      .score-board {
+        margin-top: 30px;
+        width: 100%;
+        max-width: 600px;
+        background: #fff9c4;
+        padding: 20px;
+        border-radius: 20px;
+        border: 2px dashed #fbc02d;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .btn-purple {
+        background: #9c27b0;
+        color: white;
+      }
+      .btn-green {
+        background: #4caf50;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="nav-bar">
+      <button class="btn btn-purple" onclick="changeQuestion(-1)">
+        ⬅️ 上一个
+      </button>
+      <select id="questSelect" onchange="jumpToQuestion(this.value)"></select>
+      <button class="btn btn-purple" onclick="changeQuestion(1)">
+        下一个 ➡️
+      </button>
+    </div>
+
+    <div class="main-display">
+      <h2>👂 听录音，选单词</h2>
+
+      <div id="choicesArea" class="choices-container"></div>
+
+      <div id="feedbackText" class="feedback"></div>
+
+      <div class="controls">
+        <button class="btn btn-green" onclick="playAudio()">▶️ 播放</button>
+        <button class="btn btn-purple" onclick="pauseAudio()">⏸ 暂停</button>
+        <button class="btn btn-purple" onclick="replayAudio()">🔄 重放</button>
+      </div>
+    </div>
+
+    <div class="score-board">
+      <h3>🏆 第一遍就答对的题目:</h3>
+      <ul id="scoreList"></ul>
+    </div>
+
+    <script>
+      const testData = JSON.parse(localStorage.getItem("testData")) || [];
+      let currentIdx = 0;
+      let firstTryTracker = new Set(); // Tracks questions failed on first try
+      let correctFirstTry = new Set(); // Tracks questions passed on first try
+      const audio = new Audio();
+
+      const questSelect = document.getElementById("questSelect");
+      const choicesArea = document.getElementById("choicesArea");
+      const feedbackText = document.getElementById("feedbackText");
+      const scoreList = document.getElementById("scoreList");
+
+      // Populate dropdown
+      testData.forEach((_, i) => {
+        let opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = `问题 ${i + 1}`;
+        questSelect.appendChild(opt);
+      });
+
+      function loadQuestion(index) {
+        currentIdx = index;
+        questSelect.value = index;
+        const [audioSrc, choices, answer] = testData[index];
+
+        audio.src = audioSrc;
+        feedbackText.textContent = "";
+        choicesArea.innerHTML = "";
+
+        choices.forEach((text, i) => {
+          const btn = document.createElement("button");
+          btn.className = "choice-btn";
+          btn.textContent = text;
+          btn.onclick = () => checkAnswer(i, answer, text, btn);
+          choicesArea.appendChild(btn);
+        });
+      }
+
+      function checkAnswer(selectedIdx, correctIdx, text, btnElement) {
+        const isCorrect = selectedIdx === correctIdx;
+
+        if (isCorrect) {
+          feedbackText.textContent = "✅ 太棒了！(Correct!)";
+          feedbackText.style.color = "#4CAF50";
+          btnElement.classList.add("correct");
+
+          // Score logic: If they haven't failed this question yet, it's a first-try success
+          if (
+            !firstTryTracker.has(currentIdx) &&
+            !correctFirstTry.has(currentIdx)
+          ) {
+            correctFirstTry.add(currentIdx);
+            updateScoreBoard();
+          }
+        } else {
+          feedbackText.textContent = "❌ 不对哦，再试试！(Incorrect)";
+          feedbackText.style.color = "#F44336";
+          btnElement.classList.add("incorrect");
+
+          // Mark as failed for first-try credit
+          firstTryTracker.add(currentIdx);
+        }
+      }
+
+      function updateScoreBoard() {
+        scoreList.innerHTML = "";
+        correctFirstTry.forEach((idx) => {
+          const li = document.createElement("li");
+          li.textContent = `问题 ${idx + 1}: ${testData[idx][1][testData[idx][2]]}`;
+          scoreList.appendChild(li);
+        });
+      }
+
+      function playAudio() {
+        audio.play();
+      }
+      function pauseAudio() {
+        audio.pause();
+      }
+      function replayAudio() {
+        audio.currentTime = 0;
+        audio.play();
+      }
+
+      function changeQuestion(dir) {
+        let next = currentIdx + dir;
+        if (next >= 0 && next < testData.length) loadQuestion(next);
+      }
+
+      function jumpToQuestion(val) {
+        loadQuestion(parseInt(val));
+      }
+
+      // Init
+      if (testData.length > 0) loadQuestion(0);
+    </script>
+  </body>
+</html>
