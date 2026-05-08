@@ -65,19 +65,19 @@
         .map((x) => {
           let a = x.split("");
           a[a.length - 1] = `${a[a.length - 1]}s`;
-          return [a, `./audio/${x}.m4a`, `./images/${x}.png`];
+          return [a, `./audio/${x}.m4a`, `./images/${x}.webp`];
         });
       const ePractice = "bed, pen, pet, wet, hen, red, ten"
         .split(", ")
-        .map((x) => [x.split(""), `./audio/${x}.m4a`, `./images/${x}.png`]);
+        .map((x) => [x.split(""), `./audio/${x}.m4a`, `./images/${x}.webp`]);
       const pluralsCard = {
-        image: "./images/pot.png",
+        image: "./images/pot.webp",
         link: "template.html",
         title: "复数 练习",
         phrases: plurals,
       };
       const eCard = {
-        image: "./images/bed.png",
+        image: "./images/bed.webp",
         link: "template.html",
         title: "短 e 音练习",
         phrases: ePractice,
