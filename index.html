@@ -81,6 +81,10 @@
       const ePractice = "bed, pen, pet, wet, hen, red, ten"
         .split(", ")
         .map((x) => [x.split(""), `./audio/${x}.m4a`, `./images/${x}.webp`]);
+      ePractice[1][0] = ["p", "en"];
+      ePractice[4][0] = ["h", "en"];
+      ePractice[6][0] = ["t", "en"];
+
       const pluralsCard = {
         image: "./images/pot.webp",
         link: "template.html",

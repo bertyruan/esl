@@ -161,6 +161,7 @@
       // Get data from localStorage
       const phrasesData =
         JSON.parse(localStorage.getItem("currentLesson")) || [];
+      console.log(phrasesData);
       let currentIndex = 0;
       let highlightPointer = -1;
       let timer = null;
