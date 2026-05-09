@@ -140,10 +140,10 @@
         <button id="playBtn" class="btn btn-green" onclick="replayAudio()">
           ▶️ 播放
         </button>
-        <button id="pauseBtn" class="btn btn-blue" onclick="pauseAudio()">
+        <button style="display: none" pauseBtn" class="btn btn-blue" onclick="pauseAudio()">
           ⏸ 暂停
         </button>
-        <button class="btn btn-red" onclick="replayAudio()">🔄 重读</button>
+        <button style="display: none" class="btn btn-red" onclick="replayAudio()">🔄 重读</button>
       </div>
 
       <div class="toggle-section">
@@ -156,6 +156,9 @@
         <a href="./index.html"> <button class="btn back">返回</button></a>
       </div>
     </div>
+
+    <!-- Hidden container for preloading every image at once -->
+    <div id="preloader" style="display: none;"></div>
 
     <script>
       // Get data from localStorage
@@ -194,14 +197,12 @@
         const imgSrc = data[2];
 
         // Reset opacity before changing source to trigger a new fade
-        displayImg.style.opacity = "0";
-
-        displayImg.src = imgSrc || "";
-
-        // When the new image is ready, fade it in
-        displayImg.onload = () => {
-          displayImg.style.opacity = "1";
-        };
+        if (data[2]) {
+            displayImg.src = data[2];
+            displayImg.style.display = "inline-block";
+        } else {
+            displayImg.style.display = "none";
+        }
 
         displayImg.style.display = imgSrc ? "inline-block" : "none";
         // Update UI
@@ -320,8 +321,25 @@
         stopHighlighting();
       };
 
+      function preloadAllImages() {
+        const preloader = document.getElementById('preloader');
+      
+          phrasesData.forEach((item) => {
+              const imgSrc = item[2]; // Index 2 is the image string
+              if (imgSrc && imgSrc.trim() !== "") {
+                  const img = new Image(); // Create a new image object in memory
+                  img.src = imgSrc;        // Setting src triggers immediate download
+                  preloader.appendChild(img); // Adding to DOM ensures browser prioritizes it
+              }
+          });
+      }
+
       // Initialize first phrase
-      if (phrasesData.length > 0) loadPhrase(0);
+      if (phrasesData.length > 0) {
+        preloadAllImages();
+        loadPhrase(0);
+      }
+
     </script>
   </body>
 </html>
