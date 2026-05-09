@@ -75,7 +75,8 @@
         .map((x) => {
           let a = x.split("");
           a[a.length - 1] = `${a[a.length - 1]}s`;
-          return [a, `./audio/${x}.m4a`, `./images/${x}.webp`];
+          console.log(a.join(""));
+          return [a, `./audio/${a.join("")}.m4a`, `./images/${x}.webp`];
         });
       const ePractice = "bed, pen, pet, wet, hen, red, ten"
         .split(", ")
@@ -106,7 +107,7 @@
         const div = document.createElement("div");
         div.className = "card";
         div.innerHTML = `
-                <img src="${card.image}" alt="${card.title}" loading="lazy" 
+                <img src="${card.image}" alt="${card.title}" loading="lazy"
                 class="lazy-img">
                 <h2>${card.title}</h2>
             `;
