@@ -102,6 +102,14 @@
           audio_file: "./audio/wigs.m4a",
           natural_audio_file: "./audio/ten.m4a",
         },
+        {
+          sentence: ["b", "a", "gs"],
+          blanks: [1],
+          choices: ["e", "i", "o", "u", "a"],
+          answers: [4],
+          audio_file: "./audio/bags.m4a",
+          natural_audio_file: "./audio/bags.m4a",
+        },
       ];
 
       // In your card click logic:
@@ -111,7 +119,7 @@
       const pluralsCard = {
         image: "./images/pot.webp",
         link: "template.html",
-        title: "复数 练习",
+        title: "复数练习",
         phrases: plurals,
       };
       const eCard = {
@@ -126,7 +134,7 @@
         title: "有和复数练习",
       };
 
-      const cards = [pluralsCard, eCard, tohaveCardTest];
+      const cards = [pluralsCard, eCard];
 
       const questions = [
         ["audio/pet.m4a", ["Dog", "Pet", "Cat"], 1], // Answer is index 1 (Pet)
