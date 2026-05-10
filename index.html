@@ -94,6 +94,14 @@
           audio_file: "./audio/wigs.m4a",
           natural_audio_file: "./audio/ten.m4a",
         },
+        {
+          sentence: ["The", "dog", "is", "running", "on", "the", "mat"],
+          blanks: [1, 3], // "cat" and "sleeping" will be boxes
+          choices: ["dog", "cat", "running", "sleeping", "bird"],
+          answers: [0, 2], // index 1 (cat) for the first blank, index 3 (sleeping) for the second
+          audio_file: "./audio/wigs.m4a",
+          natural_audio_file: "./audio/ten.m4a",
+        },
       ];
 
       // In your card click logic:

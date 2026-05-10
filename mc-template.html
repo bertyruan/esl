@@ -199,13 +199,52 @@
         padding: 15px 45px;
         margin-top: 10px;
       }
+      .btn-nav {
+        background-color: white;
+        border: none;
+        /* border-radius: 95%; */
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        color: var(--accent);
+        outline: none;
+      }
+
+      .btn-nav:hover {
+        background-color: var(--accent);
+        color: white;
+        transform: scale(1.1);
+      }
+
+      .btn-nav:active {
+        transform: scale(0.9);
+      }
+
+      /* Optional: style for disabled buttons at start/end of list */
+      .btn-nav:disabled {
+        border-color: #ddd;
+        color: #ddd;
+        cursor: not-allowed;
+      }
     </style>
   </head>
   <body>
     <div id="feedbackBanner"></div>
 
     <div class="header-ui">
+      <!-- Previous Button -->
+      <button class="btn-nav" onclick="changeQuestion(-1)">⬅️</button>
+
       <select id="qSelect" onchange="handleDropdownChange(this.value)"></select>
+
+      <!-- Next Button -->
+      <button class="btn-nav" onclick="changeQuestion(1)">➡️</button>
+
       <div id="starContainer" class="star-gui"></div>
     </div>
 
@@ -282,6 +321,34 @@
         loadQuestion(0);
       }
 
+      function changeQuestion(direction) {
+        let newIdx = currentIdx + direction;
+
+        // Check if the new index is within bounds
+        if (newIdx >= 0 && newIdx < questions.length) {
+          // Stop current audio and highlighting
+          stopHighlighting();
+          audio.pause();
+          naturalAudio.pause();
+
+          // Update the dropdown value visually
+          document.getElementById("qSelect").value = newIdx;
+
+          // Load the new question
+          loadQuestion(newIdx);
+
+          // Update button states (optional)
+          updateNavButtons(newIdx);
+        }
+      }
+
+      // Optional: Disable buttons if at the start or end
+      function updateNavButtons(index) {
+        const navBtns = document.querySelectorAll(".btn-nav");
+        navBtns[0].disabled = index === 0; // Disable Previous if first question
+        navBtns[1].disabled = index === questions.length - 1; // Disable Next if last question
+      }
+
       function handleDropdownChange(index) {
         // Stop any audio/highlighting from the previous question immediately
         stopHighlighting();
@@ -341,6 +408,7 @@
           choicesArea.appendChild(item);
         });
 
+        updateNavButtons(index);
         renderStars();
       }
 
