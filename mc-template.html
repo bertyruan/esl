@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>填空练习</title>
+    <style>
+      :root {
+        --box-size: 100px;
+        --accent: #9575cd;
+      }
+      body {
+        font-family: "Comic Sans MS", sans-serif;
+        background: #fce4ec;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .header-ui {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 20px;
+        background: white;
+        padding: 15px 25px;
+        border-radius: 50px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      .star-gui {
+        color: #ffd600;
+        font-size: 1.5rem;
+        letter-spacing: 5px;
+      }
+
+      .sentence-display {
+        background: white;
+        padding: 40px;
+        border-radius: 30px;
+        margin-bottom: 20px;
+        line-height: 3;
+        font-size: 1.8rem;
+        text-align: center;
+        width: 90%;
+        max-width: 800px;
+      }
+
+      /* The Drop Targets */
+      .blank-box {
+        display: inline-block;
+        width: var(--box-size);
+        height: 45px;
+        border: 3px dashed #bdbdbd;
+        border-radius: 10px;
+        vertical-align: middle;
+        margin: 0 10px;
+        line-height: 45px;
+        transition: 0.3s;
+        background: #fafafa;
+        font-size: 1.2rem;
+      }
+      .blank-box.correct {
+        border-color: #4caf50;
+        background: #e8f5e9;
+        color: #2e7d32;
+        border-style: solid;
+      }
+      .blank-box.incorrect {
+        border-color: #f44336;
+        background: #ffebee;
+        animation: shake 0.3s;
+      }
+
+      /* The Draggable Choices */
+      .choices-pool {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 30px;
+      }
+      .choice-item {
+        padding: 10px 20px;
+        background: var(--accent);
+        color: white;
+        border-radius: 12px;
+        cursor: grab;
+        font-weight: bold;
+        box-shadow: 0 4px 0 #673ab7;
+      }
+      .choice-item:active {
+        cursor: grabbing;
+      }
+
+      .btn-submit {
+        padding: 15px 40px;
+        font-size: 1.2rem;
+        background: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 4px 0 #388e3c;
+      }
+      .btn-submit:hover {
+        background: #45a049;
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-5px);
+        }
+        75% {
+          transform: translateX(5px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header-ui">
+      <select id="qSelect" onchange="loadQuestion(this.value)"></select>
+      <div id="starContainer" class="star-gui"></div>
+    </div>
+
+    <div id="sentenceArea" class="sentence-display"></div>
+
+    <div id="choicesArea" class="choices-pool"></div>
+
+    <button class="btn-submit" onclick="validateAnswers()">
+      提交答案 (Submit)
+    </button>
+
+    <button
+      onclick="window.location.href = 'index.html'"
+      style="
+        margin-top: 50px;
+        background: none;
+        border: none;
+        color: #888;
+        cursor: pointer;
+        text-decoration: underline;
+      "
+    >
+      返回主页
+    </button>
+
+    <script>
+      const questions = JSON.parse(localStorage.getItem("mcData")) || [];
+      let currentIdx = 0;
+      let isFirstTry = true;
+      let starsEarned = new Array(questions.length).fill(false);
+
+      const qSelect = document.getElementById("qSelect");
+      const sentenceArea = document.getElementById("sentenceArea");
+      const choicesArea = document.getElementById("choicesArea");
+      const starContainer = document.getElementById("starContainer");
+
+      // Init Dropdown
+      questions.forEach((q, i) => {
+        let opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = `练习 ${i + 1}`;
+        qSelect.appendChild(opt);
+      });
+
+      function loadQuestion(index) {
+        currentIdx = parseInt(index);
+        isFirstTry = true;
+        const q = questions[currentIdx];
+
+        sentenceArea.innerHTML = "";
+        choicesArea.innerHTML = "";
+        renderStars();
+
+        // Render Sentence with Blanks
+        q.sentence.forEach((word, i) => {
+          if (q.blanks.includes(i)) {
+            const box = document.createElement("div");
+            box.className = "blank-box";
+            box.dataset.blankIndex = q.blanks.indexOf(i); // Which blank is this (0, 1, 2...)
+            box.ondragover = (e) => e.preventDefault();
+            box.ondrop = handleDrop;
+            sentenceArea.appendChild(box);
+          } else {
+            sentenceArea.appendChild(document.createTextNode(word + " "));
+          }
+        });
+
+        // Render Choices
+        q.choices.forEach((choice) => {
+          const item = document.createElement("div");
+          item.className = "choice-item";
+          item.textContent = choice;
+          item.draggable = true;
+          item.ondragstart = (e) => e.dataTransfer.setData("text", choice);
+          choicesArea.appendChild(item);
+        });
+      }
+
+      function handleDrop(e) {
+        e.preventDefault();
+        const data = e.dataTransfer.getData("text");
+        // If already correct, don't allow change
+        if (this.classList.contains("correct")) return;
+        this.textContent = data;
+        this.classList.remove("incorrect");
+      }
+
+      function validateAnswers() {
+        const q = questions[currentIdx];
+        const boxes = document.querySelectorAll(".blank-box");
+        let allCorrect = true;
+
+        boxes.forEach((box) => {
+          const blankIdx = parseInt(box.dataset.blankIndex);
+          const correctAnswerText = q.choices[q.answers[blankIdx]];
+
+          if (box.textContent === correctAnswerText) {
+            box.className = "blank-box correct";
+          } else {
+            box.className = "blank-box incorrect";
+            allCorrect = false;
+            // Reset box after short delay so child can see the error
+            setTimeout(() => {
+              if (box.classList.contains("incorrect")) {
+                box.textContent = "";
+                box.classList.remove("incorrect");
+              }
+            }, 1000);
+          }
+        });
+
+        if (allCorrect && isFirstTry && !starsEarned[currentIdx]) {
+          starsEarned[currentIdx] = true;
+          renderStars();
+          alert("🌟 太棒了！第一遍就全对了！");
+        }
+
+        if (!allCorrect) isFirstTry = false;
+      }
+
+      function renderStars() {
+        starContainer.innerHTML = "";
+        starsEarned.forEach((earned) => {
+          starContainer.innerHTML += earned ? "⭐" : "☆";
+        });
+      }
+
+      // Preload first question
+      if (questions.length > 0) loadQuestion(0);
+    </script>
+  </body>
+</html>

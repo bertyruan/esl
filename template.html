@@ -140,10 +140,21 @@
         <button id="playBtn" class="btn btn-green" onclick="replayAudio()">
           ▶️ 播放
         </button>
-        <button style="display: none" pauseBtn" class="btn btn-blue" onclick="pauseAudio()">
+        <button
+          style="display: none"
+          pauseBtn
+          class="btn btn-blue"
+          onclick="pauseAudio()"
+        >
           ⏸ 暂停
         </button>
-        <button style="display: none" class="btn btn-red" onclick="replayAudio()">🔄 重读</button>
+        <button
+          style="display: none"
+          class="btn btn-red"
+          onclick="replayAudio()"
+        >
+          🔄 重读
+        </button>
       </div>
 
       <div class="toggle-section">
@@ -153,18 +164,20 @@
       </div>
 
       <div style="margin-top: 1rem">
-        <a href="./index.html"> <button class="btn back">返回</button></a>
+        <a href="./index.html">
+          <button style="width: 50%" class="btn back">返回</button></a
+        >
       </div>
     </div>
 
     <!-- Hidden container for preloading every image at once -->
-    <div id="preloader" style="display: none;"></div>
+    <div id="preloader" style="display: none"></div>
 
     <script>
       // Get data from localStorage
       const phrasesData =
         JSON.parse(localStorage.getItem("currentLesson")) || [];
-      console.log(phrasesData);
+
       let currentIndex = 0;
       let highlightPointer = -1;
       let timer = null;
@@ -198,10 +211,10 @@
 
         // Reset opacity before changing source to trigger a new fade
         if (data[2]) {
-            displayImg.src = data[2];
-            displayImg.style.display = "inline-block";
+          displayImg.src = data[2];
+          displayImg.style.display = "inline-block";
         } else {
-            displayImg.style.display = "none";
+          displayImg.style.display = "none";
         }
 
         displayImg.style.display = imgSrc ? "inline-block" : "none";
@@ -322,16 +335,16 @@
       };
 
       function preloadAllImages() {
-        const preloader = document.getElementById('preloader');
-      
-          phrasesData.forEach((item) => {
-              const imgSrc = item[2]; // Index 2 is the image string
-              if (imgSrc && imgSrc.trim() !== "") {
-                  const img = new Image(); // Create a new image object in memory
-                  img.src = imgSrc;        // Setting src triggers immediate download
-                  preloader.appendChild(img); // Adding to DOM ensures browser prioritizes it
-              }
-          });
+        const preloader = document.getElementById("preloader");
+
+        phrasesData.forEach((item) => {
+          const imgSrc = item[2]; // Index 2 is the image string
+          if (imgSrc && imgSrc.trim() !== "") {
+            const img = new Image(); // Create a new image object in memory
+            img.src = imgSrc; // Setting src triggers immediate download
+            preloader.appendChild(img); // Adding to DOM ensures browser prioritizes it
+          }
+        });
       }
 
       // Initialize first phrase
@@ -339,7 +352,6 @@
         preloadAllImages();
         loadPhrase(0);
       }
-
     </script>
   </body>
 </html>
