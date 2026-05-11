@@ -96,6 +96,7 @@
         background: #fafafa;
         transition: 0.2s;
         cursor: pointer;
+        text-align: center;
       }
 
       .blank-box.correct {
@@ -128,6 +129,7 @@
         cursor: pointer;
         font-weight: bold;
         transition: 0.1s;
+        font-size: 1.5rem;
       }
       .choice-item.selected-choice {
         outline: 4px solid #ffd600;
@@ -184,10 +186,11 @@
         margin-top: 10px;
       }
       .btn-nav {
-        background-color: white;
-        border: none;
-        /* border-radius: 95%; */
-        width: 40px;
+        background-color: whitesmoke;
+        border: grey;
+
+        border-radius: 50px;
+        width: 100px;
         height: 40px;
         font-size: 1.2rem;
         cursor: pointer;
@@ -216,12 +219,47 @@
         cursor: not-allowed;
       }
 
+      .content-row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 20px;
+        flex-wrap: wrap; /* Allows stacking on small mobile screens */
+        font-size: 1.5rem;
+      }
+
+      .q-image {
+        max-width: 200px;
+        max-height: 200px;
+        width: auto;
+        height: auto;
+        border-radius: 20px;
+        border: 5px solid #f3e5f5;
+        object-fit: contain;
+        background: #fff;
+        display: none; /* Hidden by default if no image exists */
+      }
+
       /* Highlighting Styles */
       .sentence-display {
-        line-height: 3;
+        flex: 1; /* Takes up remaining space */
+        min-width: 250px;
+        line-height: 2.5;
         font-size: 1.8rem;
-        margin-bottom: 20px;
+        text-align: left; /* Better flow next to an image */
       }
+
+      @media (max-width: 600px) {
+        .content-row {
+          flex-direction: column;
+        }
+        .sentence-display {
+          text-align: center;
+        }
+      }
+
       .word-span {
         padding: 0 5px;
         border-radius: 8px;
@@ -232,6 +270,12 @@
         background-color: var(--highlight);
         transform: scale(1.1);
       }
+
+      .custom-nav-buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+      }
     </style>
   </head>
   <body>
@@ -239,18 +283,22 @@
 
     <div class="header-ui">
       <!-- Previous Button -->
-      <button class="btn-nav" onclick="changeQuestion(-1)">⬅️</button>
 
       <select id="qSelect" onchange="handleDropdownChange(this.value)"></select>
 
       <!-- Next Button -->
-      <button class="btn-nav" onclick="changeQuestion(1)">➡️</button>
 
       <div id="starContainer" class="star-gui"></div>
     </div>
 
     <div class="main-card">
-      <div id="sentenceArea" class="sentence-display"></div>
+      <div class="content-row">
+        <!-- New Image Element -->
+        <img id="questionImg" class="q-image" src="" alt="Question Image" />
+
+        <!-- Existing Sentence Area -->
+        <div id="sentenceArea" class="sentence-display"></div>
+      </div>
 
       <div class="controls">
         <div class="audio-buttons">
@@ -265,6 +313,11 @@
         <button class="btn btn-submit" onclick="validateAnswers()">
           提交答案 (Submit)
         </button>
+        <button class="btn" onclick="clearBox()">重置 (Clear)</button>
+        <div class="custom-nav-buttons">
+          <button class="btn-nav" onclick="changeQuestion(-1)">上一个</button>
+          <button class="btn-nav" onclick="changeQuestion(1)">下一个</button>
+        </div>
       </div>
     </div>
 
@@ -284,7 +337,9 @@
     <script>
       // Data Structure Updated
       // Example: { sentence: [...], blanks: [1], choices: [...], answers: [1], audio_file: "...", natural_audio_file: "..." }
-      const questions = JSON.parse(localStorage.getItem("mcData")) || [];
+      const data = JSON.parse(localStorage.getItem("currentLesson")) || {};
+      const questions = data.data;
+      formatQuestions(questions);
       let currentIdx = 0;
       let isFirstTry = true;
       let starsEarned = new Array(questions.length).fill(false);
@@ -320,6 +375,16 @@
 
         // Load the very first question
         loadQuestion(0);
+      }
+
+      function formatQuestions(questions) {
+        questions.forEach((v, i) => {
+          questions[i].audio_file = `./audio/${questions[i].audio_file}`;
+          questions[i].natural_audio_file =
+            `./audio/${questions[i].natural_audio_file}`;
+          questions[i].image = `./images/${questions[i].image}`;
+          questions[i].sentence = questions[i].sentence.split(" ");
+        });
       }
 
       function changeQuestion(direction) {
@@ -376,6 +441,14 @@
 
         const q = questions[currentIdx];
 
+        // 1. Handle Image Loading
+        if (q.image && q.image.trim() !== "") {
+          questionImg.src = q.image;
+          questionImg.style.display = "block";
+        } else {
+          questionImg.style.display = "none";
+        }
+
         // Set Audio Sources
         audio.src = q.audio_file || "";
         naturalAudio.src = q.natural_audio_file || "";
@@ -397,6 +470,11 @@
           }
           sentenceArea.appendChild(span);
         });
+        if (data.punctuation) {
+          const span = document.createElement("span");
+          span.textContent = data.punctuation;
+          sentenceArea.appendChild(span);
+        }
 
         // Render Choices
         q.choices.forEach((choice) => {
@@ -472,6 +550,13 @@
             .querySelectorAll(".choice-item")
             .forEach((el) => el.classList.remove("selected-choice"));
         }
+      }
+
+      function clearBox() {
+        const boxes = document.querySelectorAll(".blank-box");
+        boxes.forEach((box) => {
+          box.textContent = "";
+        });
       }
 
       function validateAnswers() {

@@ -69,96 +69,46 @@
     <div class="card-container" id="cardGrid"></div>
 
     <script>
-      // Data structure provided
-      const plurals = "wig, rag, bag, cup, hat, pot, bed, kid"
-        .split(", ")
-        .map((x) => {
-          let a = x.split("");
-          a[a.length - 1] = `${a[a.length - 1]}s`;
-          console.log(a.join(""));
-          return [a, `./audio/${a.join("")}.m4a`, `./images/${x}.webp`];
+      function renderCards(cards) {
+        const grid = document.getElementById("cardGrid");
+        Object.keys(cards).forEach((name) => {
+          const card = cards[name];
+          const div = document.createElement("div");
+          div.className = "card";
+          div.innerHTML = `
+                  <img src="./images/${card.image}" alt="${card.title}" loading="lazy"
+                  class="lazy-img">
+                  <h2>${card.title}</h2>
+              `;
+          div.onclick = () => {
+            // Save specific lesson data to local storage for the template page
+            localStorage.setItem("currentLesson", JSON.stringify(card));
+            window.location.href = card.link;
+          };
+          grid.appendChild(div);
         });
-      const ePractice = "bed, pen, pet, wet, hen, red, ten"
-        .split(", ")
-        .map((x) => [x.split(""), `./audio/${x}.m4a`, `./images/${x}.webp`]);
-      ePractice[1][0] = ["p", "en"];
-      ePractice[4][0] = ["h", "en"];
-      ePractice[6][0] = ["t", "en"];
+      }
 
-      const mcQuestions = [
-        {
-          sentence: ["The", "cat", "is", "sleeping", "on", "the", "mat"],
-          blanks: [1, 3], // "cat" and "sleeping" will be boxes
-          choices: ["dog", "cat", "running", "sleeping", "bird"],
-          answers: [1, 3], // index 1 (cat) for the first blank, index 3 (sleeping) for the second
-          audio_file: "./audio/wigs.m4a",
-          natural_audio_file: "./audio/ten.m4a",
-        },
-        {
-          sentence: ["The", "dog", "is", "running", "on", "the", "mat"],
-          blanks: [1, 3], // "cat" and "sleeping" will be boxes
-          choices: ["dog", "cat", "running", "sleeping", "bird"],
-          answers: [0, 2], // index 1 (cat) for the first blank, index 3 (sleeping) for the second
-          audio_file: "./audio/wigs.m4a",
-          natural_audio_file: "./audio/ten.m4a",
-        },
-        {
-          sentence: ["b", "a", "gs"],
-          blanks: [1],
-          choices: ["e", "i", "o", "u", "a"],
-          answers: [4],
-          audio_file: "./audio/bags.m4a",
-          natural_audio_file: "./audio/bags.m4a",
-        },
-      ];
+      // Function to load the JSON data
+      async function loadWebsiteData() {
+        try {
+          // Fetch the external JSON file
+          const data = await fetch("./data/multipleChoice.json");
+          const cards = await data.json();
 
-      // In your card click logic:
-      // localStorage.setItem('mcData', JSON.stringify(mcQuestions));
-      // window.location.href = "mc-template.html";
+          // Store it in localStorage so the template pages can see it
+          // localStorage.setItem("mcData", JSON.stringify(cards));
 
-      const pluralsCard = {
-        image: "./images/pot.webp",
-        link: "template.html",
-        title: "复数练习",
-        phrases: plurals,
-      };
-      const eCard = {
-        image: "./images/bed.webp",
-        link: "template.html",
-        title: "短 e 音练习",
-        phrases: ePractice,
-      };
-      const tohaveCardTest = {
-        image: "./images/pet.webp",
-        link: "mc-template.html",
-        title: "有和复数练习",
-      };
+          // Call the function to render your cards (Lesson Selection)
+          renderCards(cards);
+        } catch (error) {
+          console.error("Error loading JSON data:", error);
+          document.body.innerHTML +=
+            "<p style='color:red; text-align:center;'>无法加载数据。请确保使用了服务器环境运行 (Live Server)。</p>";
+        }
+      }
 
-      const cards = [pluralsCard, eCard];
-
-      const questions = [
-        ["audio/pet.m4a", ["Dog", "Pet", "Cat"], 1], // Answer is index 1 (Pet)
-        ["audio/morning.m4a", ["Morning", "Night", "Afternoon"], 0],
-      ];
-      localStorage.setItem("testData", JSON.stringify(questions));
-      localStorage.setItem("mcData", JSON.stringify(mcQuestions));
-
-      const grid = document.getElementById("cardGrid");
-      cards.forEach((card) => {
-        const div = document.createElement("div");
-        div.className = "card";
-        div.innerHTML = `
-                <img src="${card.image}" alt="${card.title}" loading="lazy"
-                class="lazy-img">
-                <h2>${card.title}</h2>
-            `;
-        div.onclick = () => {
-          // Save specific lesson data to local storage for the template page
-          localStorage.setItem("currentLesson", JSON.stringify(card.phrases));
-          window.location.href = card.link;
-        };
-        grid.appendChild(div);
-      });
+      window.onload = loadWebsiteData;
     </script>
   </body>
 </html>

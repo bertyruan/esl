@@ -1,0 +1,180 @@
+{
+  "eCard": {
+    "title": "短 e 音练习",
+    "image": "bed.webp",
+    "link": "template.html",
+    "targetVocab": "bed, pen, pet, wet, hen, red, ten",
+    "data": [
+      [["b", "e", "d"], "bed.m4a", "bed.webp"],
+      [["p", "en"], "pen.m4a", "pen.webp"],
+      [["p", "e", "t"], "pet.m4a", "pet.webp"],
+      [["w", "e", "t"], "wet.m4a", "wet.webp"],
+      [["h", "en"], "hen.m4a", "hen.webp"],
+      [["r", "e", "d"], "red.m4a", "red.webp"],
+      [["t", "en"], "ten.m4a", "ten.webp"]
+    ]
+  },
+  "pluralCard": {
+    "title": "复数练习",
+    "image": "pot.webp",
+    "link": "template.html",
+    "targetVocab": "wigs, rags, bags, cups, hats, pots, beds, kids",
+    "data": [
+      [["w", "i", "gs"], "wigs.m4a", "wig.webp"],
+      [["r", "a", "gs"], "rags.m4a", "rag.webp"],
+      [["b", "a", "gs"], "bags.m4a", "bag.webp"],
+      [["c", "u", "ps"], "cups.m4a", "cup.webp"],
+      [["h", "a", "ts"], "hats.m4a", "hat.webp"],
+      [["p", "o", "ts"], "pots.m4a", "pot.webp"],
+      [["b", "e", "ds"], "beds.m4a", "bed.webp"],
+      [["k", "i", "ds"], "kids.m4a", "kid.webp"]
+    ]
+  },
+  "haveCard1": {
+    "title": "have/has练习1",
+    "image": "cat.webp",
+    "link": "mc-template.html",
+    "targetVocab": "mug, hen, hat, log, pig, bag",
+    "targetLanguage": "to have",
+    "punctuation": ".",
+    "data": [
+      {
+        "sentence": "I have 2 mugs.",
+        "blanks": [1, 3],
+        "choices": ["mugs", "has", "have", "mug"],
+        "answers": [2, 0],
+        "audio_file": "test11.m4a",
+        "natural_audio_file": "test11c.m4a",
+        "image": "mug.webp"
+      },
+      {
+        "sentence": "Bob has ten hens.",
+        "blanks": [1, 3],
+        "choices": ["has", "have", "hen", "hens"],
+        "answers": [0, 3],
+        "audio_file": "test12.m4a",
+        "natural_audio_file": "test12c.m4a",
+        "image": "hen.webp"
+      },
+      {
+        "sentence": "Lad and Dot have 3 hats.",
+        "blanks": [3, 5],
+        "choices": ["hats", "hat", "have", "has"],
+        "answers": [2, 0],
+        "audio_file": "test13.m4a",
+        "natural_audio_file": "test13c.m4a",
+        "image": "hat.webp"
+      },
+      {
+        "sentence": "She has 6 logs.",
+        "blanks": [1, 3],
+        "choices": ["has", "have", "log", "logs"],
+        "answers": [0, 3],
+        "audio_file": "test15.m4a",
+        "natural_audio_file": "test15c.m4a",
+        "image": "log.webp"
+      },
+      {
+        "sentence": "I have 1 pig.",
+        "blanks": [1, 3],
+        "choices": ["has", "have", "pig", "pigs"],
+        "answers": [1, 2],
+        "audio_file": "test15.m4a",
+        "natural_audio_file": "test15c.m4a",
+        "image": "pig.webp"
+      },
+      {
+        "sentence": "Mat has 1 bag.",
+        "blanks": [1, 3],
+        "choices": ["has", "have", "bag", "bags"],
+        "answers": [0, 2],
+        "audio_file": "test16.m4a",
+        "natural_audio_file": "test16c.m4a",
+        "image": "bag.webp"
+      }
+    ]
+  },
+  "testCard1": {
+    "title": "单词测验1",
+    "image": "hat.webp",
+    "link": "mc-template.html",
+    "targetVocab": "bug, tag, bed, win, mug, bag",
+    "data": [
+      {
+        "sentence": "b u g",
+        "blanks": [0, 1, 2],
+        "choices": ["b", "u", "e", "l", "g"],
+        "answers": [0, 1, 4],
+        "audio_file": "bug.m4a",
+        "natural_audio_file": "",
+        "image": "bug.webp"
+      },
+      {
+        "sentence": "t a g",
+        "blanks": [0, 1, 2],
+        "choices": ["b", "a", "e", "t", "g"],
+        "answers": [3, 1, 4],
+        "audio_file": "tag.m4a",
+        "natural_audio_file": "",
+        "image": "tag.webp"
+      },
+      {
+        "sentence": "b e d",
+        "blanks": [0, 1, 2],
+        "choices": ["d", "b", "e", "n", "q"],
+        "answers": [1, 2, 0],
+        "audio_file": "bed.m4a",
+        "natural_audio_file": "",
+        "image": "bed.webp"
+      },
+      {
+        "sentence": "w i n",
+        "blanks": [0, 1, 2],
+        "choices": ["z", "w", "i", "n", "d"],
+        "answers": [1, 2, 3],
+        "audio_file": "win.m4a",
+        "natural_audio_file": "",
+        "image": "win.webp"
+      },
+      {
+        "sentence": "m u g",
+        "blanks": [0, 1, 2],
+        "choices": ["m", "u", "g", "o", "d"],
+        "answers": [0, 1, 2],
+        "audio_file": "mug.m4a",
+        "natural_audio_file": "",
+        "image": "mug.webp"
+      },
+      {
+        "sentence": "b a g",
+        "blanks": [0, 1, 2],
+        "choices": ["b", "d", "e", "a", "g"],
+        "answers": [0, 3, 4],
+        "audio_file": "bag.m4a",
+        "natural_audio_file": "",
+        "image": "bag.webp"
+      }
+    ]
+  },
+  "testCard2": {
+    "title": "单词测验2",
+    "image": "bug.webp",
+    "link": "mc-template.html",
+    "targetVocab": "ten, log, dig, hop, pan, big",
+    "data": []
+  },
+  "testCard3": {
+    "title": "单词测验3",
+    "image": "hug.webp",
+    "link": "mc-template.html",
+    "targetVocab": "pen, pit, hug, pet, pot, hat",
+    "data": []
+  },
+  "testCard4": {
+    "title": "单词测验4",
+    "image": "pig.webp",
+    "link": "mc-template.html",
+    "targetVocab": "wig, hen, pig, dog, fat, wet",
+    "data": []
+  }
+}
