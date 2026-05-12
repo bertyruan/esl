@@ -3,7 +3,11 @@ setlocal enabledelayedexpansion
 
 :: --- Configuration ---
 :: Set quality (0-100). 75 is recommended for high compression with low visible loss.
+<<<<<<< HEAD
 set QUALITY=10
+=======
+set QUALITY=40
+>>>>>>> bd811d84ddbba2ca6fcb59c81afee75bd63eecd2
 
 echo Starting in-place lossy compression...
 echo WARNING: This will overwrite your original files.
