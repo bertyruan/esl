@@ -210,7 +210,7 @@
         "image": "pan.webp"
       },
       {
-        "sentence": "big",
+        "sentence": "b i g",
         "blanks": [0, 1, 2],
         "choices": ["d", "b", "e", "i", "g"],
         "answers": [1, 3, 4],
