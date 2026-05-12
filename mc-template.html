@@ -468,10 +468,15 @@
         naturalAudioBtn.classList.remove("visible");
         const q = questions[currentIdx];
 
+        questionImg.style.opacity = "0";
+
         // 1. Handle Image Loading
         if (q.image && q.image.trim() !== "") {
           questionImg.src = q.image;
           questionImg.style.display = "block";
+          questionImg.onload = () => {
+            questionImg.style.opacity = "1";
+          };
         } else {
           questionImg.style.display = "none";
         }
