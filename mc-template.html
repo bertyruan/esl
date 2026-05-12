@@ -41,6 +41,7 @@
 
       .header-ui {
         display: flex;
+        flex-direction: column;
         align-items: center;
         gap: 20px;
         margin-bottom: 20px;
@@ -48,6 +49,21 @@
         padding: 10px 25px;
         border-radius: 50px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        width: 95%;
+        max-width: 800px;
+      }
+
+      /* .header-ui div {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      } */
+
+      .btn-nav-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 2rem;
       }
 
       /* Updated Dropdown CSS */
@@ -67,12 +83,14 @@
         background-repeat: no-repeat;
         background-position: right 10px center;
         background-size: 15px;
+        width: 240px;
       }
 
       .star-gui {
         color: #ffd600;
         font-size: 1.5rem;
         letter-spacing: 5px;
+        text-align: center;
       }
       .main-card {
         background: white;
@@ -282,15 +300,19 @@
     <div id="feedbackBanner"></div>
 
     <div class="header-ui">
-      <!-- Previous Button -->
+      <div>
+        <select
+          id="qSelect"
+          onchange="handleDropdownChange(this.value)"
+        ></select>
 
-      <select id="qSelect" onchange="handleDropdownChange(this.value)"></select>
-
-      <!-- Next Button -->
-
-      <div id="starContainer" class="star-gui"></div>
+        <div id="starContainer" class="star-gui"></div>
+      </div>
+      <div class="btn-nav-container">
+        <button class="btn-nav" onclick="changeQuestion(-1)">上一个</button>
+        <button class="btn-nav" onclick="changeQuestion(1)">下一个</button>
+      </div>
     </div>
-
     <div class="main-card">
       <div class="content-row">
         <!-- New Image Element -->
@@ -314,10 +336,6 @@
           提交答案 (Submit)
         </button>
         <button class="btn" onclick="clearBox()">重置 (Clear)</button>
-        <div class="custom-nav-buttons">
-          <button class="btn-nav" onclick="changeQuestion(-1)">上一个</button>
-          <button class="btn-nav" onclick="changeQuestion(1)">下一个</button>
-        </div>
       </div>
     </div>
 
@@ -335,11 +353,9 @@
     </button>
 
     <script>
-      // Data Structure Updated
-      // Example: { sentence: [...], blanks: [1], choices: [...], answers: [1], audio_file: "...", natural_audio_file: "..." }
       const data = JSON.parse(localStorage.getItem("currentLesson")) || {};
-      const questions = data.data;
-      formatQuestions(questions);
+      const questions = formatQuestions(data.data);
+
       let currentIdx = 0;
       let isFirstTry = true;
       let starsEarned = new Array(questions.length).fill(false);
@@ -380,11 +396,13 @@
       function formatQuestions(questions) {
         questions.forEach((v, i) => {
           questions[i].audio_file = `./audio/${questions[i].audio_file}`;
-          questions[i].natural_audio_file =
-            `./audio/${questions[i].natural_audio_file}`;
+          questions[i].natural_audio_file = questions[i].natural_audio_file
+            ? `./audio/${questions[i].natural_audio_file}`
+            : "";
           questions[i].image = `./images/${questions[i].image}`;
           questions[i].sentence = questions[i].sentence.split(" ");
         });
+        return questions;
       }
 
       function changeQuestion(direction) {
@@ -433,12 +451,13 @@
         // UI Reset
         const sentenceArea = document.getElementById("sentenceArea");
         const choicesArea = document.getElementById("choicesArea");
-        const audioGroup = document.querySelector(".audio-buttons");
+        const audioBtn = document.querySelector(".btn-audio");
+        const naturalAudioBtn = document.querySelector(".btn-natural");
 
         sentenceArea.innerHTML = "";
         choicesArea.innerHTML = "";
-        audioGroup.classList.remove("visible"); // Hide audio buttons for new question
-
+        audioBtn.classList.remove("visible"); // Hide audio buttons for new question
+        naturalAudioBtn.classList.remove("visible");
         const q = questions[currentIdx];
 
         // 1. Handle Image Loading
@@ -564,7 +583,8 @@
         const boxes = document.querySelectorAll(".blank-box");
         let allCorrect = true;
 
-        document.querySelector(".audio-buttons").classList.add("visible");
+        document.querySelector(".btn-audio").classList.add("visible");
+        document.querySelector(".btn-natural").classList.add("visible");
 
         boxes.forEach((box) => {
           const blankIdx = parseInt(box.dataset.blankIndex);

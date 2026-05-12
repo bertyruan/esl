@@ -3,6 +3,7 @@
     "title": "短 e 音练习",
     "image": "bed.webp",
     "link": "template.html",
+    "isProduction": true,
     "targetVocab": "bed, pen, pet, wet, hen, red, ten",
     "data": [
       [["b", "e", "d"], "bed.m4a", "bed.webp"],
@@ -19,6 +20,7 @@
     "image": "pot.webp",
     "link": "template.html",
     "targetVocab": "wigs, rags, bags, cups, hats, pots, beds, kids",
+    "isProduction": true,
     "data": [
       [["w", "i", "gs"], "wigs.m4a", "wig.webp"],
       [["r", "a", "gs"], "rags.m4a", "rag.webp"],
@@ -112,8 +114,8 @@
       {
         "sentence": "t a g",
         "blanks": [0, 1, 2],
-        "choices": ["b", "a", "e", "t", "g"],
-        "answers": [3, 1, 4],
+        "choices": ["t", "a", "e", "h", "g"],
+        "answers": [0, 1, 4],
         "audio_file": "tag.m4a",
         "natural_audio_file": "",
         "image": "tag.webp"
@@ -121,8 +123,8 @@
       {
         "sentence": "b e d",
         "blanks": [0, 1, 2],
-        "choices": ["d", "b", "e", "n", "q"],
-        "answers": [1, 2, 0],
+        "choices": ["d", "b", "e", "n", "d"],
+        "answers": [1, 2, 4],
         "audio_file": "bed.m4a",
         "natural_audio_file": "",
         "image": "bed.webp"
@@ -161,7 +163,17 @@
     "image": "bug.webp",
     "link": "mc-template.html",
     "targetVocab": "ten, log, dig, hop, pan, big",
-    "data": []
+    "data": [
+      {
+        "sentence": "t e n",
+        "blanks": [0, 1, 2],
+        "choices": ["t", "h", "e", "i", "n"],
+        "answers": [1, 2, 4],
+        "audio_file": "hen.m4a",
+        "natural_audio_file": "",
+        "image": "hen.webp"
+      }
+    ]
   },
   "testCard3": {
     "title": "单词测验3",

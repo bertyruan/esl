@@ -73,21 +73,19 @@
         const grid = document.getElementById("cardGrid");
         Object.keys(cards).forEach((name) => {
           const card = cards[name];
-          if (card.isProduction) {
-            const div = document.createElement("div");
-            div.className = "card";
-            div.innerHTML = `
-                    <img src="./images/${card.image}" alt="${card.title}" loading="lazy"
-                    class="lazy-img">
-                    <h2>${card.title}</h2>
-                `;
-            div.onclick = () => {
-              // Save specific lesson data to local storage for the template page
-              localStorage.setItem("currentLesson", JSON.stringify(card));
-              window.location.href = card.link;
-            };
-            grid.appendChild(div);
-          }
+          const div = document.createElement("div");
+          div.className = "card";
+          div.innerHTML = `
+                  <img src="./images/${card.image}" alt="${card.title}" loading="lazy"
+                  class="lazy-img">
+                  <h2>${card.title}</h2>
+              `;
+          div.onclick = () => {
+            // Save specific lesson data to local storage for the template page
+            localStorage.setItem("currentLesson", JSON.stringify(card));
+            window.location.href = card.link;
+          };
+          grid.appendChild(div);
         });
       }
 
