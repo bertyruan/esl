@@ -97,7 +97,7 @@
     ]
   },
   "testCard1": {
-    "title": "单词测验1",
+    "title": "短音单词测验1",
     "image": "hat.webp",
     "link": "mc-template.html",
     "targetVocab": "bug, tag, bed, win, mug, bag",
@@ -159,8 +159,8 @@
     ]
   },
   "testCard2": {
-    "title": "单词测验2",
-    "image": "bug.webp",
+    "title": "短音单词测验2",
+    "image": "ten.webp",
     "link": "mc-template.html",
     "targetVocab": "ten, log, dig, hop, pan, big",
     "data": [
@@ -169,24 +169,179 @@
         "blanks": [0, 1, 2],
         "choices": ["t", "h", "e", "i", "n"],
         "answers": [1, 2, 4],
-        "audio_file": "hen.m4a",
+        "audio_file": "ten.m4a",
         "natural_audio_file": "",
-        "image": "hen.webp"
+        "image": "ten.webp"
+      },
+      {
+        "sentence": "l o g",
+        "blanks": [0, 1, 2],
+        "choices": ["l", "o", "e", "i", "g"],
+        "answers": [0, 1, 4],
+        "audio_file": "log.m4a",
+        "natural_audio_file": "",
+        "image": "log.webp"
+      },
+      {
+        "sentence": "d i g",
+        "blanks": [0, 1, 2],
+        "choices": ["d", "a", "i", "g", "p"],
+        "answers": [0, 1, 4],
+        "audio_file": "dig.m4a",
+        "natural_audio_file": "",
+        "image": "dig.webp"
+      },
+      {
+        "sentence": "h o p",
+        "blanks": [0, 1, 2],
+        "choices": ["h", "t", "c", "o", "p"],
+        "answers": [0, 3, 4],
+        "audio_file": "hop.m4a",
+        "natural_audio_file": "",
+        "image": "hop.webp"
+      },
+      {
+        "sentence": "p a n",
+        "blanks": [0, 1, 2],
+        "choices": ["p", "a", "e", "i", "n"],
+        "answers": [0, 1, 4],
+        "audio_file": "pan.m4a",
+        "natural_audio_file": "",
+        "image": "pan.webp"
+      },
+      {
+        "sentence": "big",
+        "blanks": [0, 1, 2],
+        "choices": ["d", "b", "e", "i", "g"],
+        "answers": [1, 3, 4],
+        "audio_file": "big.m4a",
+        "natural_audio_file": "",
+        "image": "big.webp"
       }
     ]
   },
   "testCard3": {
-    "title": "单词测验3",
+    "title": "短音单词测验3",
     "image": "hug.webp",
     "link": "mc-template.html",
-    "targetVocab": "pen, pit, hug, pet, pot, hat",
-    "data": []
+    "targetVocab": "pen, pit, hug, pet, fat, hat",
+    "data": [
+      {
+        "sentence": "p e n",
+        "blanks": [0, 1, 2],
+        "choices": ["p", "h", "e", "i", "n"],
+        "answers": [0, 2, 4],
+        "audio_file": "pen.m4a",
+        "natural_audio_file": "",
+        "image": "pen.webp"
+      },
+      {
+        "sentence": "p i t",
+        "blanks": [0, 1, 2],
+        "choices": ["p", "h", "e", "i", "t"],
+        "answers": [0, 3, 4],
+        "audio_file": "pit.m4a",
+        "natural_audio_file": "",
+        "image": "pit.webp"
+      },
+      {
+        "sentence": "h u g",
+        "blanks": [0, 1, 2],
+        "choices": ["p", "h", "o", "u", "g"],
+        "answers": [1, 3, 4],
+        "audio_file": "hug.m4a",
+        "natural_audio_file": "",
+        "image": "hug.webp"
+      },
+      {
+        "sentence": "p e t",
+        "blanks": [0, 1, 2],
+        "choices": ["p", "h", "i", "e", "t"],
+        "answers": [0, 3, 4],
+        "audio_file": "pet.m4a",
+        "natural_audio_file": "",
+        "image": "pet.webp"
+      },
+      {
+        "sentence": "f a t",
+        "blanks": [0, 1, 2],
+        "choices": ["f", "g", "a", "e", "t"],
+        "answers": [0, 2, 4],
+        "audio_file": "fat.m4a",
+        "natural_audio_file": "",
+        "image": "fat.webp"
+      },
+      {
+        "sentence": "h a t",
+        "blanks": [0, 1, 2],
+        "choices": ["f", "h", "a", "l", "t"],
+        "answers": [1, 2, 4],
+        "audio_file": "hat.m4a",
+        "natural_audio_file": "",
+        "image": "hat.webp"
+      }
+    ]
   },
   "testCard4": {
-    "title": "单词测验4",
+    "title": "短音单词测验4",
     "image": "pig.webp",
     "link": "mc-template.html",
-    "targetVocab": "wig, hen, pig, dog, fat, wet",
-    "data": []
+    "targetVocab": "wig, hen, pig, dog, pot, wet",
+    "data": [
+      {
+        "sentence": "w i g",
+        "blanks": [0, 1, 2],
+        "choices": ["w", "a", "i", "x", "g"],
+        "answers": [0, 2, 4],
+        "audio_file": "wig.m4a",
+        "natural_audio_file": "",
+        "image": "wig.webp"
+      },
+      {
+        "sentence": "h e n",
+        "blanks": [0, 1, 2],
+        "choices": ["f", "h", "a", "e", "n"],
+        "answers": [1, 3, 4],
+        "audio_file": "hen.m4a",
+        "natural_audio_file": "",
+        "image": "hat.webp"
+      },
+      {
+        "sentence": "p i g",
+        "blanks": [0, 1, 2],
+        "choices": ["p", "d", "e", "i", "g"],
+        "answers": [0, 3, 4],
+        "audio_file": "pig.m4a",
+        "natural_audio_file": "",
+        "image": "pig.webp"
+      },
+      {
+        "sentence": "d o g",
+        "blanks": [0, 1, 2],
+        "choices": ["b", "d", "u", "o", "g"],
+        "answers": [1, 3, 4],
+        "audio_file": "dog.m4a",
+        "natural_audio_file": "",
+        "image": "dog.webp"
+      },
+      {
+        "sentence": "p o t",
+        "blanks": [0, 1, 2],
+        "choices": ["p", "u", "o", "g", "t"],
+        "answers": [0, 2, 4],
+        "audio_file": "pot.m4a",
+        "natural_audio_file": "",
+        "image": "pot.webp"
+      },
+      {
+        "sentence": "w e t",
+        "blanks": [0, 1, 2],
+        "choices": ["w", "e", "i", "t", "g"],
+        "answers": [0, 1, 3],
+        "audio_file": "wet.m4a",
+        "natural_audio_file": "",
+        "image": "wet.webp"
+      }
+    ]
   }
 }

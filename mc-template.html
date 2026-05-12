@@ -340,7 +340,7 @@
     </div>
 
     <button
-      onclick="window.location.href = 'index.html'"
+      onclick="backButton()"
       style="
         margin-top: 30px;
         background: none;
@@ -353,6 +353,12 @@
     </button>
 
     <script>
+      function backButton() {
+        window.location.href = questions.isProduction
+          ? "index.html"
+          : "test.html";
+      }
+
       const data = JSON.parse(localStorage.getItem("currentLesson")) || {};
       const questions = formatQuestions(data.data);
 
