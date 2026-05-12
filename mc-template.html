@@ -351,6 +351,7 @@
     >
       🏠 返回主页
     </button>
+    <div id="preloader" style="display: none"></div>
 
     <script>
       function backButton() {
@@ -396,6 +397,7 @@
         });
 
         // Load the very first question
+        preloadAllImages();
         loadQuestion(0);
       }
 
@@ -631,6 +633,19 @@
         setTimeout(() => {
           banner.className = "";
         }, 3000);
+      }
+
+      function preloadAllImages() {
+        const preloader = document.getElementById("preloader");
+
+        questions.forEach((item) => {
+          const imgSrc = item.image;
+          if (imgSrc && imgSrc.trim() !== "") {
+            const img = new Image(); // Create a new image object in memory
+            img.src = imgSrc; // Setting src triggers immediate download
+            preloader.appendChild(img); // Adding to DOM ensures browser prioritizes it
+          }
+        });
       }
 
       function renderStars() {
