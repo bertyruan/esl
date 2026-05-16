@@ -104,7 +104,7 @@
 
       .blank-box {
         display: inline-block;
-        min-width: var(--box-size);
+        /* min-width: var(--box-size); */
         height: 50px;
         border: 3px dashed #bdbdbd;
         border-radius: 12px;
@@ -163,12 +163,13 @@
       .audio-buttons {
         display: flex;
         gap: 10px;
-        display: none; /* Hidden by default */
+
         gap: 10px;
         margin-bottom: 10px;
       }
-      .audio-buttons.visible {
-        display: flex; /* Shown when validated */
+      .audio-buttons > .visible {
+        /* display: flex;  */
+        display: inline;
         animation: fadeIn 0.5s;
       }
       @keyframes fadeIn {
@@ -191,10 +192,12 @@
       .btn-audio {
         background: #ff8a65;
         color: white;
+        display: none;
       }
       .btn-natural {
         background: #4fc3f7;
         color: white;
+        display: none;
       }
       .btn-submit {
         background: var(--success);
@@ -355,9 +358,7 @@
 
     <script>
       function backButton() {
-        window.location.href = questions.isProduction
-          ? "index.html"
-          : "test.html";
+        window.location.href = data.isProduction ? "index.html" : "test.html";
       }
 
       const data = JSON.parse(localStorage.getItem("currentLesson")) || {};
@@ -468,6 +469,11 @@
         naturalAudioBtn.classList.remove("visible");
         const q = questions[currentIdx];
 
+        const isLetters = q.sentence.reduce(
+          (p, c) => p && c.length === 1,
+          true,
+        );
+
         questionImg.style.opacity = "0";
 
         // 1. Handle Image Loading
@@ -492,6 +498,9 @@
 
           if (q.blanks.includes(i)) {
             span.className = "blank-box";
+            span.style = isLetters
+              ? "min-width: 55px"
+              : "min-width: var(--box-size)";
             span.dataset.blankIndex = q.blanks.indexOf(i);
             span.onclick = function () {
               handleBoxClick(this);
@@ -596,8 +605,10 @@
         const boxes = document.querySelectorAll(".blank-box");
         let allCorrect = true;
 
-        document.querySelector(".btn-audio").classList.add("visible");
-        document.querySelector(".btn-natural").classList.add("visible");
+        q.audio_file &&
+          document.querySelector(".btn-audio").classList.add("visible");
+        q.natural_audio_file &&
+          document.querySelector(".btn-natural").classList.add("visible");
 
         boxes.forEach((box) => {
           const blankIdx = parseInt(box.dataset.blankIndex);
